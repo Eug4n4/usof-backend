@@ -1,5 +1,11 @@
 {
+  "type": "module",
   "dependencies": {
-    "express": "^5.1.0"
+    "@adminjs/express": "^6.1.1",
+    "@adminjs/sql": "^2.2.6",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.14.4"
   }
 }
