@@ -2,6 +2,7 @@ import express from 'express';
 import User from './models/User.js'
 import Post from './models/Post.js';
 import Category from './models/Category.js';
+import authRouter from './auth/router.js';
 
 const router = express.Router();
 
@@ -19,5 +20,5 @@ router.get('/categories', async (req, res) => {
     const result = await Category.getAll();
     res.json(result);
 })
-
+router.use('/auth', authRouter)
 export default router;

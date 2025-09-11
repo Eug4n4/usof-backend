@@ -14,6 +14,7 @@ AdminJS.registerAdapter({
 const start = async () => {
     const app = express();
     app.use(express.json());
+    app.use(express.urlencoded())
     app.use('/api', router);
     const db = await new Adapter("mysql2", config).init();
     const admin = new AdminJS({
