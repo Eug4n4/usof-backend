@@ -6,6 +6,7 @@ class User extends Model {
 
     constructor(args) {
         super(args);
+        Model.table = User.#table
     }
 
     static async findBy(field, value) {
