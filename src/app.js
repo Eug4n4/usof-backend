@@ -4,6 +4,7 @@ import AdminJS from 'adminjs'
 import AdminJSExpress from '@adminjs/express'
 import router from './router.js'
 import { config } from "./db/db.js"
+import session from "express-session"
 
 
 const PORT = 8080;
@@ -13,6 +14,11 @@ AdminJS.registerAdapter({
 })
 const start = async () => {
     const app = express();
+    app.use(session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false
+    }))
     app.use(express.json());
     app.use(express.urlencoded())
     app.use('/api', router);
