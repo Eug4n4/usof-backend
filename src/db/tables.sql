@@ -19,6 +19,7 @@ email VARCHAR(255) NOT NULL UNIQUE,
 photo BLOB,
 rating INT UNSIGNED DEFAULT 0,
 role_id INT NOT NULL,
+is_active TINYINT(1) DEFAULT 0,
 PRIMARY KEY(id),
 FOREIGN KEY(role_id) REFERENCES roles(id)
 );
