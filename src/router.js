@@ -1,8 +1,8 @@
 import express from 'express';
 import User from './models/User.js'
-import Post from './models/Post.js';
-import Category from './models/Category.js';
 import authRouter from './auth/router.js';
+import postsRouter from './posts/router.js';
+import categoryRouter from './categories/router.js';
 
 const router = express.Router();
 
@@ -11,14 +11,9 @@ router.get('/users', async (req, res) => {
     res.json(result);
 })
 
-router.get('/posts', async (req, res) => {
-    const result = await Post.getAll();
-    res.json(result);
-})
 
-router.get('/categories', async (req, res) => {
-    const result = await Category.getAll();
-    res.json(result);
-})
+
+router.use('/posts', postsRouter)
+router.use('/categories', categoryRouter)
 router.use('/auth', authRouter)
 export default router;
