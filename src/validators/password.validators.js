@@ -16,9 +16,7 @@ const passwordMatches = async (password, { req }) => {
     const fieldName = validated['login'] ? 'login' : validated['email'] ? 'email' : undefined;
     if (fieldName) {
         const user = await User.findBy(fieldName, validated[fieldName]);
-        if (compareSync(password, user.password)) {
-            req.session.user = { login: user.login, full_name: user.full_name, email: user.email }
-        } else {
+        if (!compareSync(password, user.password)) {
             throw new Error('Password didn\'t match')
         }
     }
