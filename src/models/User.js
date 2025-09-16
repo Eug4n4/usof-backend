@@ -23,7 +23,13 @@ class User extends Model {
     }
 
     static async getAll() {
-        return [await connectionPool.promise().query(`SELECT id, login, email, full_name, photo, rating, role_id FROM ${this.table}`)][0][0];
+        return [await connectionPool.promise().query(`SELECT id, login, email, full_name, photo, rating, role_id FROM ${User.#table}`)][0][0];
+    }
+
+    static async getById(id) {
+        return [await connectionPool.promise().query(
+            `SELECT id, login, email, full_name, photo, rating, role_id FROM ${User.#table}
+			 WHERE id = ?`, [id])][0][0];
     }
 
     static get table() {
