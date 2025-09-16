@@ -72,3 +72,10 @@ FOREIGN KEY(author) REFERENCES users(id),
 FOREIGN KEY(post_id) REFERENCES posts(id),
 FOREIGN KEY(comment_id) REFERENCES comments(id)
 );
+
+CREATE TABLE IF NOT EXISTS tokens(
+user_id INT NOT NULL,
+refresh VARCHAR(255) NOT NULL,
+PRIMARY KEY(user_id),
+FOREIGN KEY(user_id) REFERENCES users(id)
+);
