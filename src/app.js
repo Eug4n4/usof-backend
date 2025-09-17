@@ -4,6 +4,7 @@ import AdminJS from 'adminjs'
 import AdminJSExpress from '@adminjs/express'
 import router from './router.js'
 import { config } from "./db/db.js"
+import cookieParser from "cookie-parser"
 
 
 const PORT = 8080;
@@ -13,6 +14,7 @@ AdminJS.registerAdapter({
 })
 const start = async () => {
     const app = express();
+    app.use(cookieParser())
     app.use(express.raw())
     app.use(express.json());
     app.use(express.urlencoded())
