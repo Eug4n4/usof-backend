@@ -54,10 +54,12 @@ FOREIGN KEY(category_id) REFERENCES categories(id)
 CREATE TABLE IF NOT EXISTS comments(
 id INT NOT NULL AUTO_INCREMENT,
 author INT NOT NULL,
-publish_date DATE NOT NULL,
+post_id INT NOT NULL,
+publish_date DATETIME NOT NULL DEFAULT (NOW()),
 content TEXT NOT NULL,
 PRIMARY KEY(id),
-FOREIGN KEY(author) REFERENCES users(id)
+FOREIGN KEY(author) REFERENCES users(id),
+FOREIGN KEY(post_id) REFERENCES posts(id)
 );
 
 CREATE TABLE IF NOT EXISTS likes(
