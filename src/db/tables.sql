@@ -70,6 +70,8 @@ comment_id INT
 publish_date DATE NOT NULL DEFAULT (CURDATE()),
 type TINYINT(1) NOT NULL,
 PRIMARY KEY(id),
+UNIQUE (author, post_id),
+UNIQUE (author, comment_id),
 FOREIGN KEY(author) REFERENCES users(id),
 FOREIGN KEY(post_id) REFERENCES posts(id),
 FOREIGN KEY(comment_id) REFERENCES comments(id)
