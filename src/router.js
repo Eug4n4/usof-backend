@@ -3,6 +3,7 @@ import authRouter from './auth/router.js';
 import postsRouter from './posts/router.js';
 import categoryRouter from './categories/router.js';
 import userRouter from './users/router.js';
+import commentsRouter from './comments/router.js';
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ const router = express.Router();
 router.use('/users', userRouter)
 router.use('/posts', postsRouter)
 router.use('/categories', categoryRouter)
+router.use('/comments', commentsRouter)
 router.use('/auth', authRouter)
 export default router;

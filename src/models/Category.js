@@ -30,6 +30,15 @@ class Category extends Model {
         )][0][0]
     }
 
+    static async getByPostId(id) {
+        return [await connectionPool.promise().query(
+            `select posts.title, posts.publish_date, categories.title as category from posts \
+            inner join post_categories on posts.id = post_categories.post_id \
+            right join categories on categories.id = post_categories.category_id where posts.id = ?`,
+            [id]
+        )][0][0]
+    }
+
     static async getRelatedPosts(id) {
         return [await connectionPool.promise().query(
             `select categories.title as category, posts.title, posts.content, posts.publish_date from categories \
