@@ -2,21 +2,29 @@ import { body } from "express-validator";
 import Like from "../models/Like.js"
 
 
-const likeExists = async (req, res, next) => {
-    const postId = req.params['post_id'];
-    const userId = req.user['id'];
-    const like = await Like.getByPostUserId(postId, userId);
-    if (like == null) {
-        next()
-    } else {
-        res.status(400);
-        res.json({ 'message': 'You have already liked this post' })
+const likeExists = (method, paramName) => {
+    return async (req, res, next) => {
+        const parameter = req.params[paramName];
+        const userId = req.user['id'];
+        const like = await method(parameter, userId);
+        if (like == null) {
+            next()
+        } else {
+            res.status(400);
+            res.json({ 'message': 'You have already liked this' })
+        }
     }
 }
 
-const likeValidator = [
+const postLikeValidator = [
     body('type').exists().isInt({ min: 0, max: 1 }),
-    likeExists
+    likeExists(Like.getByPostUserId, 'post_id')
 ]
 
-export default likeValidator;
+const commentLikeValidator = [
+    body('type').exists().isInt({ min: 0, max: 1 }),
+    likeExists(Like.getByCommentUserId, 'comment_id')
+
+]
+
+export { postLikeValidator, commentLikeValidator };

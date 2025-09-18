@@ -36,6 +36,19 @@ class Like extends Model {
 
         )][0][0]
     }
+
+    static async getByCommentUserId(commentId, userId) {
+        const [rows] = await connectionPool.promise().query(
+            `select comments.content, likes.type from likes inner join \
+            comments on comments.id = likes.comment_id where likes.comment_id = ? and likes.author = ?`,
+            [commentId, userId]
+        )
+        const row = rows[0];
+        if (!row) {
+            return null;
+        }
+        return new Like(row);
+    }
 }
 
 export default Like;
