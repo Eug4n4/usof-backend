@@ -49,7 +49,7 @@ class User extends Model {
 
     static async getByEmail(email) {
         const [rows] = await connectionPool.promise().query(
-            `SELECT id, login, email, full_name, photo, rating, role_id FROM users where email = ?`, [email]
+            `SELECT id, login, email, full_name, photo, rating, is_active, role_id FROM users where email = ?`, [email]
         );
         const row = rows[0];
         if (!row) {

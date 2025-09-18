@@ -32,21 +32,15 @@ const getCategoryPosts = async (req, res) => {
 }
 
 const createOne = async (req, res) => {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) {
-        const { title, description } = matchedData(req);
-        let category;
-        if (description) {
-            category = new Category({ title, description })
-        } else {
-            category = new Category({ title })
-        }
-        category.save();
-        res.json(category)
+    const { title, description } = matchedData(req);
+    let category;
+    if (description) {
+        category = new Category({ title, description })
     } else {
-        res.status(400)
-        res.json(errors.array())
+        category = new Category({ title })
     }
+    category.save();
+    res.json(category)
 }
 
 export { getOne, getAll, getCategoryPosts, createOne }
