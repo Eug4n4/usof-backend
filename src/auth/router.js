@@ -7,6 +7,7 @@ import { fullNameValidator } from '../validators/fullName.validator.js';
 import login from './login.controller.js';
 import logout from './logout.controller.js';
 import verifyMail from './verifyMail.controller.js';
+import refreshToken from './refresh.controller.js';
 
 const authRouter = express.Router();
 
@@ -15,4 +16,5 @@ authRouter.post('/register', fullNameValidator(), loginValidator().custom(loginU
 authRouter.post('/login', loginValidator().custom(loginMatches), emailValidator().custom(emailMatches), passwordValidator().custom(passwordMatches), login)
 authRouter.post('/logout', logout)
 authRouter.get('/verify/:token', verifyMail)
+authRouter.get('/refresh', refreshToken)
 export default authRouter;

@@ -14,8 +14,20 @@ class Token extends Model {
         return Token.#table
     }
 
-    async delete(token) {
-        await connectionPool.promise().query(`DELETE from ${Token.#table} WHERE refresh = ?`, [token]);
+    static async findBy(field, value) {
+        const [rows] = await connectionPool.promise().query(
+            `SELECT * FROM tokens WHERE ${field} = ?`,
+            [value]
+        );
+        const row = rows[0];
+        if (!row) {
+            return null;
+        }
+        return new Token(Object.assign({}, row));
+    }
+
+    async delete() {
+        await connectionPool.promise().query(`DELETE from ${Token.#table} WHERE refresh = ?`, [this.refresh]);
     }
 }
 

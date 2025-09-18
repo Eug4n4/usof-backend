@@ -15,7 +15,7 @@ const login = async (req, res) => {
             const { login, email } = matchedData(req);
             const user = await User.getByEmail(email);
             const userDto = await UserDto.createInstance(user)
-            const { access, refresh } = createTokenPair(userDto, 10 * 60 * 1000, 2 * 60 * 60 * 1000)
+            const { access, refresh } = createTokenPair(userDto)
             res.cookie("access", access['token'], { expires: new Date(access['expires']) })
             res.cookie("refresh", refresh['token'], { httpOnly: true, expires: new Date(refresh['expires']) })
             res.json(userDto)
