@@ -5,7 +5,7 @@ import { createTokenPair } from './generateTokens.js';
 
 const refresh = async (refreshToken) => {
     const tokenData = jwt.verify(refreshToken, process.env.JWT_SECRET)
-    const user = await User.findBy('email', tokenData['email'])
+    const user = await User.findBy('id', tokenData['id'])
     const token = await Token.findBy('refresh', refreshToken)
     if (!token) {
         throw new Error("Unauthorized");

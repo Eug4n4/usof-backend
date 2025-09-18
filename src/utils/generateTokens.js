@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken'
 import Token from '../models/Token.js'
 
 const generateAccessToken = (user) => {
-    const expires = Date.now() + 60 * 1000;
+    const expires = Date.now() + 10 * 60 * 1000;
 
     return {
-        token: jwt.sign({ email: user['email'], role: user['role'] }, process.env.JWT_SECRET, { expiresIn: expires }),
+        token: jwt.sign({ id: user['id'], role: user['role'] }, process.env.JWT_SECRET, { expiresIn: expires }),
         expires: expires
     }
 }
@@ -13,7 +13,7 @@ const generateAccessToken = (user) => {
 const generateRefreshToken = (user) => {
     const expires = Date.now() + 2 * 60 * 60 * 1000;
     return {
-        token: jwt.sign({ email: user['email'] }, process.env.JWT_SECRET, { expiresIn: expires }),
+        token: jwt.sign({ id: user['id'] }, process.env.JWT_SECRET, { expiresIn: expires }),
         expires: expires
     }
 }

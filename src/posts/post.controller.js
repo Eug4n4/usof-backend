@@ -2,6 +2,7 @@ import { matchedData, validationResult } from "express-validator";
 import Post from "../models/Post.js";
 import Category from "../models/Category.js";
 import User from "../models/User.js"
+import Like from "../models/Like.js";
 
 const getAll = async (req, res) => {
     const result = await Post.getAll();
@@ -20,25 +21,28 @@ const getOne = async (req, res) => {
 }
 
 const createOne = async (req, res) => {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) {
-        const { title, content, categories } = matchedData(req);
-        const createdCategories = await Category.getByNames(categories);
-        const { id } = await User.findBy('email', req.user['email']);
-        if (createdCategories.length === categories.length) {
-            const newPost = new Post({ author: id, title, content });
-            newPost.save().then(() => {
-                newPost.setCategories(createdCategories)
-            })
-            res.json(newPost);
-        } else {
-            res.status(400);
-            res.json({ 'message': 'Some category didn\'t exist' })
-        }
+    const { title, content, categories } = matchedData(req);
+    const createdCategories = await Category.getByNames(categories);
+    const { id } = await User.findBy('id', req.user['id']);
+    if (createdCategories.length === categories.length) {
+        const newPost = new Post({ author: id, title, content });
+        newPost.save().then(() => {
+            newPost.setCategories(createdCategories)
+        })
+        res.json(newPost);
     } else {
         res.status(400);
-        res.json(errors.array());
+        res.json({ 'message': 'Some category didn\'t exist' })
     }
+
 }
 
-export { getAll, getOne, createOne };
+const createLike = async (req, res) => {
+    const { type } = matchedData(req);
+    const postId = req.params['post_id'];
+    // const user = await User.findBy('id', req.user['id'])
+    new Like({ post_id: postId, author: req.user.id, type: type }).save();
+    res.json({ 'message': 'like created' })
+}
+
+export { getAll, getOne, createOne, createLike };
