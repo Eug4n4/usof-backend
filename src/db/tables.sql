@@ -31,7 +31,7 @@ author INT NOT NULL,
 title VARCHAR(150) NOT NULL,
 publish_date DATE NOT NULL DEFAULT (CURDATE()),
 content TEXT NOT NULL,
-status TINYINT(1) DEFAULT 1,
+is_active TINYINT(1) DEFAULT 1,
 PRIMARY KEY(id),
 FOREIGN KEY(author) REFERENCES users(id)
 );
@@ -57,6 +57,7 @@ author INT NOT NULL,
 post_id INT NOT NULL,
 publish_date DATETIME NOT NULL DEFAULT (NOW()),
 content TEXT NOT NULL,
+is_active TINYINT(1) DEFAULT 1;
 PRIMARY KEY(id),
 FOREIGN KEY(author) REFERENCES users(id),
 FOREIGN KEY(post_id) REFERENCES posts(id)
