@@ -37,7 +37,7 @@ class CategoryFilter extends FieldFilter {
         } else {
             let template = '?,'.repeat(this.categoriesLength);
             template = template.slice(0, template.length - 1)
-            query += `${this.field} in (${template}) and `
+            query += ` in (${template}) and `
         }
         if (this.wrapper) {
             query = this.wrapper.apply(query)
