@@ -13,7 +13,7 @@ import commentValidator from "../validators/comment.validators.js";
 
 const postsRouter = express.Router();
 
-postsRouter.get('/', getByParameter(undefined, Post.getAll))
+postsRouter.get('/', getAll)
 postsRouter.get('/:post_id', getByParameter('post_id', Post.getById))
 postsRouter.get('/:post_id/comments', getByParameter('post_id', Comment.getByPostId))
 postsRouter.get('/:post_id/categories', getByParameter('post_id', Category.getByPostId))

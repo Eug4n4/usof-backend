@@ -10,21 +10,41 @@ class Post extends Model {
         Model.table = Post.#table;
     }
 
-    static async getAll() {
-        return [await connectionPool.promise().query(
-            `select users.full_name as author, posts.title as title, posts.content as content, categories.title as category \
-			from ${Post.#table} left join ${User.table} on ${Post.#table}.author = ${User.table}.id \
-			left join post_categories on ${Post.#table}.id = post_categories.post_id \ 
-			left join categories on categories.id = post_categories.category_id;`,
-        )][0][0]
+    static async getAll(options, queryValues) {
+        let query = 'SELECT posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+            users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
+            COALESCE(MAX(likes.dislikes), 0) AS dislikes FROM posts \
+            inner join users on posts.author = users.id \
+            LEFT JOIN post_categories ON posts.id = post_categories.post_id \
+            LEFT JOIN categories ON categories.id = post_categories.category_id \
+            LEFT JOIN (SELECT post_id, SUM(type = 1) AS likes, SUM(type = 0) AS dislikes FROM likes GROUP BY post_id) \
+            likes ON likes.post_id = posts.id';
+        if (options['filter']) {
+            query += ' where '
+            query = options['filter'].apply(query)
+        }
+        query += ' group by posts.id ';
+
+        if (options['sort']) {
+            query += 'order by ';
+            query = options['sort'].apply(query);
+        }
+        queryValues = queryValues.filter(value => value != undefined);
+        return [await connectionPool.promise().query(query, queryValues)][0][0]
+
     }
 
     static async getById(id) {
         return [await connectionPool.promise().query(
-            `select users.full_name as author, posts.title, posts.content, categories.title as category \
-			from posts inner join users on posts.author = users.id left join post_categories on \
-			posts.id = post_categories.post_id left join categories on categories.id = post_categories.category_id \
-			where posts.id = ?`, [id]
+            `select posts.title, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+            users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
+            COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
+            inner join users on posts.author = users.id \
+			left join post_categories on posts.id = post_categories.post_id \ 
+			left join categories on categories.id = post_categories.category_id \
+            LEFT JOIN (SELECT post_id, SUM(type = 1) AS likes, SUM(type = 0) AS dislikes FROM likes GROUP BY post_id) \
+            likes on likes.post_id = posts.id \
+            where posts.id = ? group by posts.id order by likes desc`, [id]
         )][0][0]
     }
 
