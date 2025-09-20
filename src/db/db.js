@@ -7,6 +7,7 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DATABASE,
+    dateStrings: true
 }
 
 const connectionPool = mysql2.createPool(config)
