@@ -33,8 +33,8 @@ const hideToken = (db) => {
     return {
         resource: db.table('tokens'),
         options: {
-            properties: {
-                refresh: { isVisible: false }
+            actions: {
+                list: { isAccessible: false }
             }
         }
     }
