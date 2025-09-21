@@ -29,7 +29,10 @@ class Post extends Model {
             query += 'order by ';
             query = options['sort'].apply(query);
         }
+        query += ` limit ?,?`;
         queryValues = queryValues.filter(value => value != undefined);
+        queryValues.push(options['offset']);
+        queryValues.push(options['pageSize']);
         return [await connectionPool.promise().query(query, queryValues)][0][0]
 
     }

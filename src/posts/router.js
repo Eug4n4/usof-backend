@@ -10,10 +10,11 @@ import Like from "../models/Like.js";
 import validationErrors from "../validators/validationErrorsMiddleware.js";
 import { postLikeValidator } from "../validators/like.validators.js";
 import commentValidator from "../validators/comment.validators.js";
+import queryValidator from "../validators/query.validators.js";
 
 const postsRouter = express.Router();
 
-postsRouter.get('/', getAll)
+postsRouter.get('/', ...queryValidator, validationErrors, getAll)
 postsRouter.get('/:post_id', getByParameter('post_id', Post.getById))
 postsRouter.get('/:post_id/comments', getByParameter('post_id', Comment.getByPostId))
 postsRouter.get('/:post_id/categories', getByParameter('post_id', Category.getByPostId))

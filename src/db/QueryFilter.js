@@ -10,7 +10,7 @@ class QueryFilter {
 
 
     apply(query) {
-        console.log('parent')
+        return query;
     }
 
 }
@@ -71,7 +71,6 @@ class RoleFilter extends QueryFilter {
     }
 
     apply(query) {
-        console.log(this.role)
         if (this.role) {
             if (this.role === 'user') {
                 if (query.search("posts.is_active") != -1) {

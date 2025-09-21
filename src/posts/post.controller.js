@@ -55,7 +55,14 @@ const getFilterStrategy = (categoriesLength, startInterval, endInterval, status,
 const getAll = async (req, res) => {
     const { access, refresh } = req.cookies;
     const userData = getAuthUserData(access, refresh);
-    let { sort, order, category, startDate, endDate, status } = req.query;
+    let { sort, order, category, startDate, endDate, status, page } = req.query;
+    page = Number(page);
+
+    if (isNaN(page) || page < 1) {
+        page = 1;
+    }
+    const pageSize = 10;
+    const offset = (page - 1) * pageSize
     if (status === 'active') {
         status = 1;
     } else if (status === 'inactive') {
@@ -73,12 +80,35 @@ const getAll = async (req, res) => {
     }
     let posts;
     if (userData?.role === 'admin' || userData == undefined) {
-        posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy }, queryValues)
+        posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
     } else if (userData?.role === 'user') {
         queryValues.push(userData.id)
-        posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy }, queryValues)
+        posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
     }
-    res.json(posts)
+    let nextUrl;
+    let previousUrl;
+    if (req.url.match(/page=[^&]*/g) != null) {
+        if (page > 1) {
+            previousUrl = req.url.replaceAll(/page=[^&]*/g, `page=${page - 1}`)
+        }
+        nextUrl = req.url.replaceAll(/page=[^&]*/g, `page=${page + 1}`);
+    } else {
+        nextUrl = req.url + `&page=${page + 1}`
+    }
+    if (previousUrl) {
+        res.json({
+            'page': `${req.host}${req.baseUrl}${req.url}`,
+            'next': `${req.host}${req.baseUrl}${nextUrl}`,
+            'prev': `${req.host}${req.baseUrl}${previousUrl}`,
+            'data': posts
+        })
+    } else {
+        res.json({
+            'page': `${req.host}${req.baseUrl}${req.url}`,
+            'next': `${req.host}${req.baseUrl}${nextUrl}`,
+            'data': posts
+        })
+    }
 
 }
 
