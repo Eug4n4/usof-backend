@@ -5,6 +5,7 @@ import AdminJSExpress from '@adminjs/express'
 import router from './router.js'
 import { config } from "./db/db.js"
 import cookieParser from "cookie-parser"
+import { adminHashPassword, hideToken } from "./utils/admin.js"
 
 const HOST = process.env.BACKEND_HOST || 'http://localhost'
 const PORT = Number(process.env.BACKEND_PORT) || 3000;
@@ -21,7 +22,8 @@ const start = async () => {
     app.use('/api', router);
     const db = await new Adapter("mysql2", config).init();
     const admin = new AdminJS({
-        databases: [db]
+        databases: [db],
+        resources: [adminHashPassword(db), hideToken(db)]
     })
     admin.watch();
     const adminRouter = AdminJSExpress.buildRouter(admin);
