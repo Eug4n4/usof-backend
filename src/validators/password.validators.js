@@ -23,4 +23,6 @@ const passwordMatches = async (password, { req }) => {
 
 }
 
-export { passwordValidator, passwordConfirmation, passwordMatches };
+const resetPasswordValidator = () => body('new_password').exists().isLength({ min: 8 })
+
+export { passwordValidator, passwordConfirmation, passwordMatches, resetPasswordValidator };

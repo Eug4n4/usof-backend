@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import hash_password from '../utils/hash_password.js';
-import sendVerificationMail from '../mail/sendMail.js';
+import { sendVerificationMail } from '../mail/sendMail.js';
 import UserDto from '../dto/UserDto.js';
 
 const registration = async (req, res) => {
