@@ -6,8 +6,8 @@ import router from './router.js'
 import { config } from "./db/db.js"
 import cookieParser from "cookie-parser"
 
-
-const PORT = 8080;
+const HOST = process.env.BACKEND_HOST || 'http://localhost'
+const PORT = Number(process.env.BACKEND_PORT) || 3000;
 AdminJS.registerAdapter({
     Database,
     Resource
@@ -27,7 +27,7 @@ const start = async () => {
     const adminRouter = AdminJSExpress.buildRouter(admin);
     app.use(admin.options.rootPath, adminRouter);
     app.listen(PORT, () => {
-        console.log(`AdminJS started on http://localhost:${PORT}${admin.options.rootPath}`)
+        console.log(`Started on ${HOST}:${PORT}`)
     })
 
 }
