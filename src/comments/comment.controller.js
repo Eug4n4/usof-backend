@@ -12,7 +12,7 @@ const createLike = (req, res) => {
 }
 
 const deleteComment = async (req, res) => {
-    const comment = await Comment.getByUserId(req.user['id'])
+    const comment = await Comment.getByCommentUserId(req.params['comment_id'], req.user['id'])
     if (comment) {
         comment.delete();
         res.json(comment)
@@ -33,4 +33,28 @@ const deleteLike = async (req, res) => {
     }
 }
 
-export { createLike, deleteComment, deleteLike }
+const updateComment = async (req, res) => {
+    let comment;
+    const { active } = matchedData(req);
+    const id = req.params['comment_id'];
+    if (req.user['role'] === 'admin') {
+        comment = await Comment.getById(id)
+        if (!comment) {
+            res.status(403);
+            res.json({ 'message': 'You are not allowed to update this resource' })
+            return;
+        }
+    } else {
+        comment = await Comment.getByCommentUserId(id, req.user['id'])
+        if (!comment) {
+            res.status(403);
+            res.json({ 'message': 'You are not allowed to update this resource' })
+            return;
+        }
+    }
+    comment.is_active = active;
+    await comment.save()
+    res.json(comment);
+}
+
+export { createLike, deleteComment, deleteLike, updateComment }

@@ -10,9 +10,7 @@ class Comment extends Model {
 
     static async getById(id) {
         const [rows] = await connectionPool.promise().query(
-            `select users.full_name as author, comments.publish_date, comments.content, posts.title from comments \
-            inner join users on users.id = comments.author \
-            inner join posts on posts.id = comments.post_id where comments.id = ?`,
+            `select * from comments where comments.id = ?`,
             [id]
         )
         const row = rows[0];
@@ -33,6 +31,11 @@ class Comment extends Model {
 
     static async getByUserId(id) {
         const [rows] = await connectionPool.promise().query(`select * from comments where author = ? `, [id])
+        return rows;
+    }
+
+    static async getByCommentUserId(commentId, userId) {
+        const [rows] = await connectionPool.promise().query(`select * from comments where id = ? and author = ?`, [commentId, userId])
         const row = rows[0];
         if (!row) {
             return null;

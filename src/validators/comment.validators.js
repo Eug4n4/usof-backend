@@ -5,4 +5,8 @@ const commentValidator = [
     body('content').exists().isLength({ max: 500 })
 ]
 
-export default commentValidator;
+const commentEditValidator = [
+    body('active').exists().isInt({ min: 0, max: 1 })
+]
+
+export { commentValidator, commentEditValidator };
