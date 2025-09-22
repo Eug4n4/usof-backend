@@ -196,4 +196,29 @@ const updatePostAdmin = async (req, res) => {
     }
 }
 
-export { getAll, getOne, createOne, createLike, createComment, updatePost, updatePostAdmin };
+const deletePost = async (req, res) => {
+    const postId = req.params['post_id'];
+    const post = await Post.getById(postId);
+    if (post) {
+        const result = new Post({ id: postId })
+        result.delete();
+        res.json(result)
+    } else {
+        res.status(403);
+        res.json({ 'message': 'You are not allowed to delete this resource' })
+    }
+}
+
+const deleteLike = async (req, res) => {
+    const postId = req.params['post_id'];
+    const like = await Like.getByPostUserId(postId, req.user['id']);
+    if (like) {
+        like.delete()
+        res.json(like);
+    } else {
+        res.status(403);
+        res.json({ 'message': 'You are not allowed to delete this resource' })
+    }
+}
+
+export { getAll, getOne, createOne, createLike, createComment, updatePost, updatePostAdmin, deletePost, deleteLike };

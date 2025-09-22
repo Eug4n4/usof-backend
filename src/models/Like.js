@@ -19,7 +19,7 @@ class Like extends Model {
 
     static async getByPostUserId(postId, userId) {
         const [rows] = await connectionPool.promise().query(
-            `select posts.title, users.full_name as author, likes.type from likes \
+            `select posts.title, users.full_name as author, likes.type, likes.id from likes \
             inner join posts on posts.id = likes.post_id \
             inner join users on users.id = likes.author where likes.post_id = ? and likes.author = ?`,
             [postId, userId]
@@ -32,14 +32,17 @@ class Like extends Model {
     }
 
     static async getByCommentId(id) {
-        return [await connectionPool.promise().query(
-
-        )][0][0]
+        const [rows] = await connectionPool.promise().query(`select * from likes where comment_id = ?`, [id])
+        const row = rows[0];
+        if (!row) {
+            return null;
+        }
+        return new Like(row);
     }
 
     static async getByCommentUserId(commentId, userId) {
         const [rows] = await connectionPool.promise().query(
-            `select comments.content, likes.type from likes inner join \
+            `select comments.content, likes.type, likes.id from likes inner join \
             comments on comments.id = likes.comment_id where likes.comment_id = ? and likes.author = ?`,
             [commentId, userId]
         )

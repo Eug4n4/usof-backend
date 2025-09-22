@@ -1,6 +1,7 @@
+import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
 
-const mustBeCreator = async (req, res, next) => {
+const mustBePostCreator = async (req, res, next) => {
     const post = await Post.getByPostAuthorId(req.params['post_id'], req.user['id'])
     if (post) {
         next();
@@ -10,7 +11,7 @@ const mustBeCreator = async (req, res, next) => {
     }
 }
 
-const mustBeAdmin = async (req, res, next) => {
+const mustBeAdmin = (req, res, next) => {
     if (req.user['role'] === 'admin') {
         next()
     } else {
@@ -20,4 +21,5 @@ const mustBeAdmin = async (req, res, next) => {
 
 }
 
-export { mustBeCreator, mustBeAdmin };
+
+export { mustBePostCreator, mustBeAdmin };
