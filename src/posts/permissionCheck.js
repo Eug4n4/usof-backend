@@ -10,4 +10,14 @@ const mustBeCreator = async (req, res, next) => {
     }
 }
 
-export default mustBeCreator;
+const mustBeAdmin = async (req, res, next) => {
+    if (req.user['role'] === 'admin') {
+        next()
+    } else {
+        res.status(403)
+        res.json({ 'message': 'You don\'t have access to update this resource' })
+    }
+
+}
+
+export { mustBeCreator, mustBeAdmin };

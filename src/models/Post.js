@@ -79,7 +79,7 @@ class Post extends Model {
     async deleteCategories() {
         const categories = await Category.getByPostId(this.id)
         for (const cat of categories) {
-            new PostCategories({ post_id: this.id, category_id: cat['category_id'] }).delete()
+            await new PostCategories({ post_id: this.id, category_id: cat['category_id'] }).delete()
         }
     }
 

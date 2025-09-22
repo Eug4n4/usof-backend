@@ -159,15 +159,10 @@ const createComment = async (req, res) => {
 
 const updatePost = async (req, res) => {
     const postId = req.params['post_id'];
-    const { title, content, categories, active } = matchedData(req);
+    const { title, content, categories } = matchedData(req);
     const newCategories = await Category.getByNames(categories)
     if (newCategories.length === categories.length) {
-        let post;
-        if (active != undefined) {
-            post = new Post({ id: postId, title: title, content: content, is_active: active })
-        } else {
-            post = new Post({ id: postId, title: title, content: content })
-        }
+        const post = new Post({ id: postId, title: title, content: content })
         post.save();
         await post.deleteCategories()
         post.setCategories(newCategories);
@@ -179,4 +174,26 @@ const updatePost = async (req, res) => {
     }
 }
 
-export { getAll, getOne, createOne, createLike, createComment, updatePost };
+const updatePostAdmin = async (req, res) => {
+    const postId = req.params['post_id'];
+    const { categories, active } = matchedData(req);
+    let post = await Post.getById(postId)
+    if (post['is_active'] === 0 && active === 1) {
+        res.json({ 'message': 'Post is inactive' })
+        return;
+    }
+    const newCategories = await Category.getByNames(categories)
+    if (newCategories.length === categories.length) {
+        post = new Post({ id: postId, is_active: active })
+        post.save();
+        await post.deleteCategories()
+        post.setCategories(newCategories);
+        res.json({ 'message': 'Updated successfully' })
+
+    } else {
+        res.status(400);
+        res.json({ 'message': 'Some category didn\'t exist' })
+    }
+}
+
+export { getAll, getOne, createOne, createLike, createComment, updatePost, updatePostAdmin };
