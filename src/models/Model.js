@@ -14,7 +14,7 @@ class Model {
     async delete() {
 
         if (this.id) {
-            await connectionPool.promise().query(`DELETE FROM ${this.table} WHERE id = ?`, [this.id]).catch(console.log)
+            await connectionPool.promise().query(`DELETE FROM ${Model.#table} WHERE id = ?`, [this.id]).catch(console.log)
         }
     }
 
