@@ -1,5 +1,5 @@
 import express from "express";
-import { createComment, createLike, createOne, getAll, getOne } from "./post.controller.js";
+import { createComment, createLike, createOne, getAll, getOne, updatePost } from "./post.controller.js";
 import { postValidator } from "../validators/post.validators.js";
 import { getByParameter } from "../utils/getByParameter.js";
 import Post from "../models/Post.js";
@@ -11,6 +11,7 @@ import validationErrors from "../validators/validationErrorsMiddleware.js";
 import { postLikeValidator } from "../validators/like.validators.js";
 import commentValidator from "../validators/comment.validators.js";
 import queryValidator from "../validators/query.validators.js";
+import mustBeCreator from "./creatorCheck.js";
 
 const postsRouter = express.Router();
 
@@ -22,5 +23,5 @@ postsRouter.get('/:post_id/like', getByParameter('post_id', Like.getByPostId))
 postsRouter.post('/', authMiddleware, ...postValidator, validationErrors, createOne)
 postsRouter.post('/:post_id/like', authMiddleware, ...postLikeValidator, validationErrors, createLike)
 postsRouter.post('/:post_id/comment', authMiddleware, ...commentValidator, validationErrors, createComment)
-
+postsRouter.patch('/:post_id', authMiddleware, ...postValidator, validationErrors, mustBeCreator, updatePost)
 export default postsRouter;

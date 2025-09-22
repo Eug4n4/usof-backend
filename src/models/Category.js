@@ -32,7 +32,7 @@ class Category extends Model {
 
     static async getByPostId(id) {
         return [await connectionPool.promise().query(
-            `select posts.title, posts.publish_date, categories.title as category from posts \
+            `select posts.title, posts.publish_date, categories.title as category, categories.id as category_id from posts \
             inner join post_categories on posts.id = post_categories.post_id \
             right join categories on categories.id = post_categories.category_id where posts.id = ?`,
             [id]
