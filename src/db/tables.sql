@@ -33,7 +33,7 @@ publish_date DATE NOT NULL DEFAULT (CURDATE()),
 content TEXT NOT NULL,
 is_active TINYINT(1) DEFAULT 1,
 PRIMARY KEY(id),
-FOREIGN KEY(author) REFERENCES users(id)
+FOREIGN KEY(author) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS categories(
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS post_categories(
 post_id INT NOT NULL,
 category_id INT NOT NULL,
 PRIMARY KEY(post_id, category_id),
-FOREIGN KEY(post_id) REFERENCES posts(id),
-FOREIGN KEY(category_id) REFERENCES categories(id)
+FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS comments(
@@ -59,8 +59,8 @@ publish_date DATETIME NOT NULL DEFAULT (NOW()),
 content TEXT NOT NULL,
 is_active TINYINT(1) DEFAULT 1;
 PRIMARY KEY(id),
-FOREIGN KEY(author) REFERENCES users(id),
-FOREIGN KEY(post_id) REFERENCES posts(id)
+FOREIGN KEY(author) REFERENCES users(id) ON DELETE CASCADE,
+FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS likes(
@@ -73,14 +73,14 @@ type TINYINT(1) NOT NULL,
 PRIMARY KEY(id),
 UNIQUE (author, post_id),
 UNIQUE (author, comment_id),
-FOREIGN KEY(author) REFERENCES users(id),
-FOREIGN KEY(post_id) REFERENCES posts(id),
-FOREIGN KEY(comment_id) REFERENCES comments(id)
+FOREIGN KEY(author) REFERENCES users(id) ON DELETE CASCADE,
+FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tokens(
 user_id INT NOT NULL,
 refresh VARCHAR(255) NOT NULL,
 PRIMARY KEY(user_id),
-FOREIGN KEY(user_id) REFERENCES users(id)
+FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
