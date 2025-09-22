@@ -31,6 +31,15 @@ class Comment extends Model {
         )][0][0]
     }
 
+    static async getByUserId(id) {
+        const [rows] = await connectionPool.promise().query(`select * from comments where author = ? `, [id])
+        const row = rows[0];
+        if (!row) {
+            return null;
+        }
+        return new Comment(row);
+    }
+
     static get table() {
         return Comment.#table;
     }
