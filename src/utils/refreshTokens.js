@@ -12,7 +12,7 @@ const refresh = async (refreshToken) => {
         throw new Error("Unauthorized");
     }
     await token.delete()
-    const userDto = UserDto.createInstance(user)
+    const userDto = await UserDto.createInstance(user)
     const { access, refresh } = createTokenPair(userDto);
     return { access, refresh }
 }
