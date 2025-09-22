@@ -43,4 +43,12 @@ const createOne = async (req, res) => {
     res.json(category)
 }
 
-export { getOne, getAll, getCategoryPosts, createOne }
+const deleteCategory = async (req, res) => {
+    const id = req.params['category_id'];
+    const category = new Category({ id: id })
+    category.delete();
+    res.json(category)
+
+}
+
+export { getOne, getAll, getCategoryPosts, createOne, deleteCategory }
