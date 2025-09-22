@@ -39,8 +39,8 @@ class Post extends Model {
     }
 
     static async getById(id) {
-        return [await connectionPool.promise().query(
-            `select posts.title, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+        const [rows] = await connectionPool.promise().query(
+            `select posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
             COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
             inner join users on posts.author = users.id \
@@ -49,7 +49,9 @@ class Post extends Model {
             LEFT JOIN (SELECT post_id, SUM(type = 1) AS likes, SUM(type = 0) AS dislikes FROM likes GROUP BY post_id) \
             likes on likes.post_id = posts.id \
             where posts.id = ? group by posts.id order by likes desc`, [id]
-        )][0][0]
+        )
+        const row = rows[0];
+        return row;
     }
 
     static async getByPostAuthorId(postId, authorId) {
