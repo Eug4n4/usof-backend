@@ -6,7 +6,7 @@ class User extends Model {
 
     constructor(args) {
         super(args);
-        Model.table = User.#table
+        this.table = User.#table
     }
 
     async getRole() {

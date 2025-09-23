@@ -5,7 +5,7 @@ class Like extends Model {
     static #table = 'likes'
     constructor(args) {
         super(args);
-        Model.table = Like.#table;
+        this.table = Like.#table;
     }
 
     static async getByPostId(id) {

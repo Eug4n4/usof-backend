@@ -7,7 +7,7 @@ class Token extends Model {
     static #table = 'tokens'
     constructor(args) {
         super(args)
-        Model.table = Token.#table
+        this.table = Token.#table
     }
 
     static get table() {

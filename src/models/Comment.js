@@ -5,7 +5,7 @@ class Comment extends Model {
     static #table = 'comments'
     constructor(args) {
         super(args)
-        Model.table = Comment.#table;
+        this.table = Comment.#table;
     }
 
     static async getById(id) {

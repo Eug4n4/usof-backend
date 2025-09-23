@@ -5,7 +5,7 @@ class PostCategories extends Model {
     static #table = 'post_categories'
     constructor(args) {
         super(args);
-        Model.table = PostCategories.#table
+        this.table = PostCategories.#table
     }
 
     async delete() {

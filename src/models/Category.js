@@ -6,7 +6,7 @@ class Category extends Model {
 
     constructor(args) {
         super(args);
-        Model.table = Category.#table;
+        this.table = Category.#table;
     }
 
     static async getAll() {

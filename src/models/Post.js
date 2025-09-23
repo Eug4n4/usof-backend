@@ -8,7 +8,7 @@ class Post extends Model {
     static #table = 'posts';
     constructor(args) {
         super(args);
-        Model.table = Post.#table;
+        this.table = Post.#table;
     }
 
     static async getAll(options, queryValues) {
