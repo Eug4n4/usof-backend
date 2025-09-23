@@ -1,6 +1,5 @@
 .adminjs/*
 .env
-package-lock.json
 node_modules/*
 uploads/avatars/*
 !uploads/avatars/user.png
