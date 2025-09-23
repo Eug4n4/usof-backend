@@ -21,5 +21,13 @@ const mustBeAdmin = (req, res, next) => {
 
 }
 
+const mustBeAdminOrSelf = (req, res, next) => {
+    if (req.user['role'] === 'admin' || req.params['user_id'] == req.user['id']) {
+        next()
+    } else {
+        res.status(403)
+        res.json({ 'message': 'You don\'t have access to update this resource' })
+    }
+}
 
-export { mustBePostCreator, mustBeAdmin };
+export { mustBePostCreator, mustBeAdmin, mustBeAdminOrSelf };
