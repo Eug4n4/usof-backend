@@ -74,4 +74,24 @@ const deleteUser = async (req, res) => {
         res.json({ 'message': 'Cannot find user' })
     }
 }
-export { getAll, getOne, createUser, updateUser, deleteUser };
+
+const uploadAvatar = async (req, res) => {
+    const user = await User.getById(req.params['user_id']);
+    if (user) {
+        if (!req.file) {
+            res.status(400).json({ 'message': 'No image uploaded!' })
+            return;
+        }
+        const fileName = req.file.filename;
+        user.photo = `uploads/avatars/${fileName}`
+        const dto = await UserDto.createInstance(user);
+        await user.save();
+        res.json(dto)
+
+    } else {
+        res.status(400)
+        res.json({ 'message': 'Cannot find user' })
+    }
+
+}
+export { getAll, getOne, createUser, updateUser, deleteUser, uploadAvatar };
