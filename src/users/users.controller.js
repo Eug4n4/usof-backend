@@ -58,4 +58,20 @@ const updateUser = async (req, res) => {
     }
 
 }
-export { getAll, getOne, createUser, updateUser };
+
+const deleteUser = async (req, res) => {
+    const user = await User.getById(req.params['user_id']);
+    if (user) {
+        if (req.user['id'] == user.id) {
+            res.json({ 'message': 'You cannot delete yourself' })
+            return;
+        }
+        const dto = await UserDto.createInstance(user);
+        user.delete();
+        res.json(dto);
+    } else {
+        res.status(400)
+        res.json({ 'message': 'Cannot find user' })
+    }
+}
+export { getAll, getOne, createUser, updateUser, deleteUser };

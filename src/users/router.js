@@ -7,7 +7,7 @@ import { loginValidator, loginUnique } from '../validators/login.validators.js';
 import { passwordConfirmation, passwordValidator, updatePasswordValidator } from '../validators/password.validators.js';
 import { emailUnique, emailValidator } from '../validators/email.validators.js';
 import validationErrors from '../validators/validationErrorsMiddleware.js';
-import { createUser, updateUser } from './users.controller.js';
+import { createUser, deleteUser, updateUser } from './users.controller.js';
 import { roleCreateValidator, roleUpdateValidator } from '../validators/role.validators.js';
 import { mustBeAdmin, mustBeAdminOrSelf } from "../utils/permissionCheck.js";
 
@@ -31,4 +31,6 @@ userRouter.patch('/:user_id', authMiddleware,
     roleUpdateValidator(),
     validationErrors,
     updateUser)
+
+userRouter.delete('/:user_id', authMiddleware, mustBeAdmin, deleteUser)
 export default userRouter;
