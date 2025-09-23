@@ -51,4 +51,18 @@ const deleteCategory = async (req, res) => {
 
 }
 
-export { getOne, getAll, getCategoryPosts, createOne, deleteCategory }
+const updateCategory = async (req, res) => {
+    const { title, description } = matchedData(req);
+    const category = await Category.getById(req.params['category_id']);
+    if (category) {
+        category.title = title;
+        category.description = description;
+        await category.save();
+        res.json(category)
+    } else {
+        res.status(400)
+        res.json({ 'message': 'Cannot find category' })
+    }
+}
+
+export { getOne, getAll, getCategoryPosts, createOne, deleteCategory, updateCategory }

@@ -24,10 +24,13 @@ class Category extends Model {
     }
 
     static async getById(id) {
-        return [await connectionPool.promise().query(
-            `SELECT id, title from ${Category.#table} where id = ?`,
-            [id]
-        )][0][0]
+        const [rows] = await connectionPool.promise().query(
+            `SELECT id, title from ${Category.#table} where id = ?`, [id]);
+        const row = rows[0];
+        if (!row) {
+            return null;
+        }
+        return new Category(row);
     }
 
     static async getByPostId(id) {

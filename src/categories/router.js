@@ -1,5 +1,5 @@
 import express from "express";
-import { createOne, deleteCategory, getAll, getCategoryPosts, getOne } from "./category.controller.js";
+import { createOne, deleteCategory, getAll, getCategoryPosts, getOne, updateCategory } from "./category.controller.js";
 import { getByParameter } from "../utils/getByParameter.js";
 import Category from "../models/Category.js";
 import { categoryValidator } from "../validators/category.validators.js";
@@ -13,5 +13,6 @@ categoryRouter.get('/', getByParameter(undefined, Category.getAll))
 categoryRouter.get('/:category_id', getByParameter('category_id', Category.getById))
 categoryRouter.get('/:category_id/posts', getByParameter('category_id', Category.getRelatedPosts))
 categoryRouter.post('/', authMiddleware, ...categoryValidator, validationErrors, mustBeAdmin, createOne)
+categoryRouter.patch('/:category_id', authMiddleware, ...categoryValidator, validationErrors, mustBeAdmin, updateCategory)
 categoryRouter.delete('/:category_id', authMiddleware, mustBeAdmin, deleteCategory)
 export default categoryRouter;
