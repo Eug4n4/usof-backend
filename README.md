@@ -3,11 +3,15 @@
 
 ## Description
 
-This repository is the backend part of the bigger project called usof - Q/A service for professional and enthusiast programmers.
+This repository is the backend part of the bigger project called usof - Q&A service for professional and enthusiast programmers.
 
 It is REST API which provides CRUD operations with the database entities: Comment, Post, Category, Like, etc.
 
 If you are interested in frontend part of the project, please, check this repository - [usof-frontend](https://github.com/Eug4n4/usof-frontend)
+
+## Documentation
+
+Refer to `DOCS.md` in order to find information about developing stages and an algorithm of the whole program
 
 ## How to run?
 
