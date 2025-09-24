@@ -6,6 +6,9 @@ import router from './router.js'
 import { config } from "./db/db.js"
 import cookieParser from "cookie-parser"
 import { adminHashPassword, hideToken } from "./utils/admin.js"
+import authMiddleware from "./auth/authMiddleware.js"
+import { mustBeAdmin } from "./utils/permissionCheck.js"
+
 
 const HOST = process.env.BACKEND_HOST || 'http://localhost'
 const PORT = Number(process.env.BACKEND_PORT) || 3000;
@@ -27,7 +30,7 @@ const start = async () => {
     })
     admin.watch();
     const adminRouter = AdminJSExpress.buildRouter(admin);
-    app.use(admin.options.rootPath, adminRouter);
+    app.use(admin.options.rootPath, authMiddleware, mustBeAdmin, adminRouter);
     app.listen(PORT, () => {
         console.log(`Started on ${HOST}:${PORT}`)
     })
