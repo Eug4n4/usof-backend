@@ -6,7 +6,7 @@ import UserDto from "../dto/UserDto.js";
 const login = async (req, res) => {
 
     if (req.cookies['access'] && req.cookies['refresh']) {
-        res.json({})
+        res.json({ 'message': 'You have already logged in' })
     } else {
         const { login, email } = matchedData(req);
         const user = await User.getByEmail(email);
