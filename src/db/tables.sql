@@ -51,6 +51,14 @@ FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
 FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS favorites(
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY(post_id, user_id),
+    FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS comments(
 id INT NOT NULL AUTO_INCREMENT,
 author INT NOT NULL,

@@ -3,6 +3,7 @@ import UserDto from "../dto/UserDto.js";
 import Role from "../models/Role.js";
 import User from "../models/User.js";
 import hash_password from "../utils/hash_password.js";
+import Favorite from "../models/Favorite.js";
 
 
 const getAll = async (req, res) => {
@@ -21,6 +22,10 @@ const getOne = async (req, res) => {
     }
 }
 
+const getFavorites = async (req, res) => {
+    const favorites = await Favorite.getByUserId(req.user['id']);
+    res.json(favorites);
+}
 
 const createUser = async (req, res) => {
     const { login, full_name, email, password, role } = matchedData(req);
@@ -94,4 +99,4 @@ const uploadAvatar = async (req, res) => {
     }
 
 }
-export { getAll, getOne, createUser, updateUser, deleteUser, uploadAvatar };
+export { getAll, getOne, createUser, updateUser, deleteUser, uploadAvatar, getFavorites };

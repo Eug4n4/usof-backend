@@ -7,6 +7,7 @@ import Comment from "../models/Comment.js";
 import getAuthUserData from "../auth/getAuthUserData.js";
 import { SortAscending, SortDescending } from "../db/QuerySort.js";
 import { CategoryFilter, DateFilter, FieldFilter, RoleFilter } from "../db/QueryFilter.js";
+import Favorite from "../models/Favorite.js";
 
 const getSortingStrategy = (sort, order) => {
     let result = new SortDescending('likes');
@@ -157,6 +158,24 @@ const createComment = async (req, res) => {
 
 }
 
+const addToFavorite = async (req, res) => {
+    const id = req.params['post_id'];
+    const post = await Post.getById(id)
+    if (post) {
+        let favorite = await Favorite.getByPostUserId(id, req.user['id'])
+        if (!favorite) {
+            favorite = new Favorite({ post_id: id, user_id: req.user['id'] })
+            favorite.save();
+            res.json(favorite)
+        } else {
+            res.status(400).json({ 'message': 'You have already added this post to your favorites' })
+        }
+    } else {
+        res.status(400);
+        res.json({ 'message': 'Cannot find post' })
+    }
+}
+
 const updatePost = async (req, res) => {
     const postId = req.params['post_id'];
     const { title, content, categories } = matchedData(req);
@@ -209,6 +228,19 @@ const deletePost = async (req, res) => {
     }
 }
 
+const deleteFromFavorites = async (req, res) => {
+    const postId = req.params['post_id'];
+    const favorite = await Favorite.getByPostUserId(postId, req.user['id']);
+    if (favorite) {
+        favorite.delete();
+        res.json(favorite);
+    } else {
+        res.status(400)
+        res.json({ 'message': 'Cannot find post' })
+    }
+
+}
+
 const deleteLike = async (req, res) => {
     const postId = req.params['post_id'];
     const like = await Like.getByPostUserId(postId, req.user['id']);
@@ -221,4 +253,4 @@ const deleteLike = async (req, res) => {
     }
 }
 
-export { getAll, getOne, createOne, createLike, createComment, updatePost, updatePostAdmin, deletePost, deleteLike };
+export { getAll, getOne, createOne, createLike, createComment, updatePost, updatePostAdmin, deletePost, deleteLike, addToFavorite, deleteFromFavorites };
