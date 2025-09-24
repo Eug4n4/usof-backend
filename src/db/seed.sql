@@ -22,7 +22,7 @@ insert into posts (author, title, content) values
 (1, 'PhantomJs Emulate IE8', 'help me with my problem');
 
 
-insert into categories (name, description) values 
+insert into categories (title, description) values 
 ('CSS','Category devoted to css'),
 ('Java','Category devoted to java'),
 ('assembly','Category devoted to asm'),

@@ -57,7 +57,7 @@ author INT NOT NULL,
 post_id INT NOT NULL,
 publish_date DATETIME NOT NULL DEFAULT (NOW()),
 content TEXT NOT NULL,
-is_active TINYINT(1) DEFAULT 1;
+is_active TINYINT(1) DEFAULT 1,
 PRIMARY KEY(id),
 FOREIGN KEY(author) REFERENCES users(id) ON DELETE CASCADE,
 FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS likes(
 id INT NOT NULL AUTO_INCREMENT,
 author INT NOT NULL,
 post_id INT,
-comment_id INT 
+comment_id INT,
 publish_date DATE NOT NULL DEFAULT (CURDATE()),
 type TINYINT(1) NOT NULL,
 PRIMARY KEY(id),
