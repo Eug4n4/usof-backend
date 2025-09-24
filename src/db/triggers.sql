@@ -26,7 +26,7 @@ BEGIN
             WHERE id = author_id;
         ELSEIF NEW.type = 0 THEN
             UPDATE users
-            SET rating = rating + 1
+            SET rating = rating - 1
             WHERE id = author_id;
         END IF;
     END IF;

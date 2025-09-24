@@ -19,6 +19,7 @@ const queryValidator = [
         if (!['desc', 'asc'].includes(req.query.order)) {
             throw new Error('Order must be desc / asc')
         }
+        return true;
     })
 ]
 
