@@ -1,8 +1,4 @@
-CREATE DATABASE IF NOT EXISTS usf;
-CREATE USER IF NOT EXISTS 'ykazka'@'localhost' IDENTIFIED BY 'securepass';
-GRANT ALL ON usf.* TO 'ykazka'@'localhost';
 
-use usf;
 
 CREATE TABLE IF NOT EXISTS roles(
 id INT NOT NULL AUTO_INCREMENT,

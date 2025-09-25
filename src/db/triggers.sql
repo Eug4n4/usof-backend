@@ -1,5 +1,3 @@
-use usf;
-DELIMITER //
 
 CREATE TRIGGER IF NOT EXISTS ins_like_dislike
 BEFORE INSERT ON likes
@@ -61,6 +59,4 @@ BEGIN
             WHERE id = author_id;
         END IF;
     END IF;
-END;//
-
-DELIMITER ;
+END;

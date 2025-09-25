@@ -1,6 +1,8 @@
 {
     "scripts": {
-        "start": "node src/app.js"
+        "start": "node src/app.js",
+        "db:create": "node src/db/create.js",
+        "db:drop": "node src/db/drop.js"
     },
     "type": "module",
     "dependencies": {
