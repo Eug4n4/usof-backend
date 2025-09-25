@@ -146,7 +146,11 @@ const createLike = async (req, res) => {
     const postId = req.params['post_id'];
     new Like({ post_id: postId, author: req.user.id, type: type }).save();
     res.status(201);
-    res.json({ 'message': 'like created' })
+    if (type == 1) {
+        res.json({ 'message': 'Like created' })
+    } else {
+        res.json({ 'message': 'Dislike created' })
+    }
 }
 
 const createComment = async (req, res) => {

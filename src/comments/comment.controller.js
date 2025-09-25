@@ -8,7 +8,11 @@ const createLike = (req, res) => {
     const comment_id = req.params['comment_id'];
     new Like({ comment_id: comment_id, author: req.user.id, type: type }).save();
     res.status(201);
-    res.json({ 'message': 'Like created' })
+    if (type == 1) {
+        res.json({ 'message': 'Like created' })
+    } else {
+        res.json({ 'message': 'Dislike created' })
+    }
 }
 
 const deleteComment = async (req, res) => {
