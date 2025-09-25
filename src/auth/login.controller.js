@@ -2,6 +2,7 @@ import { matchedData, validationResult } from "express-validator";
 import User from "../models/User.js";
 import { createTokenPair } from "../utils/generateTokens.js";
 import UserDto from "../dto/UserDto.js";
+import Token from "../models/Token.js";
 
 const login = async (req, res) => {
 
@@ -12,6 +13,10 @@ const login = async (req, res) => {
         const user = await User.getByEmail(email);
         if (user.is_active) {
             const userDto = await UserDto.createInstance(user)
+            const oldToken = await Token.findBy('user_id', user.id)
+            if (oldToken) {
+                await oldToken.delete()
+            }
             const { access, refresh } = createTokenPair(userDto)
             res.cookie("access", access['token'], { expires: new Date(access['expires']) })
             res.cookie("refresh", refresh['token'], { httpOnly: true, expires: new Date(refresh['expires']) })
