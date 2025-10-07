@@ -12,7 +12,7 @@ class Post extends Model {
     }
 
     static async getAll(options, queryValues) {
-        let query = 'SELECT posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+        let query = 'SELECT posts.title,posts.id, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
             COALESCE(MAX(likes.dislikes), 0) AS dislikes FROM posts \
             inner join users on posts.author = users.id \
