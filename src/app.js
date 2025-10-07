@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser"
 import { adminHashPassword, hideToken } from "./utils/admin.js"
 import authMiddleware from "./auth/authMiddleware.js"
 import { mustBeAdmin } from "./utils/permissionCheck.js"
-
+import cors from "cors"
 
 const HOST = process.env.BACKEND_HOST || 'http://localhost'
 const PORT = Number(process.env.BACKEND_PORT) || 3000;
@@ -19,6 +19,7 @@ AdminJS.registerAdapter({
 const start = async () => {
     const app = express();
     app.use(cookieParser())
+    app.use(cors({ origin: `${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`, credentials: true }))
     app.use(express.raw())
     app.use(express.json());
     app.use(express.urlencoded())
