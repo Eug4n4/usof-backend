@@ -5,7 +5,7 @@ const generateAccessToken = (user) => {
     const expires = Date.now() + 10 * 60 * 1000;
 
     return {
-        token: jwt.sign({ id: user['id'], role: user['role'] }, process.env.JWT_SECRET, { expiresIn: expires }),
+        token: jwt.sign({ ...user }, process.env.JWT_SECRET, { expiresIn: expires }),
         expires: expires
     }
 }
