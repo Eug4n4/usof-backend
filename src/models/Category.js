@@ -10,7 +10,7 @@ class Category extends Model {
     }
 
     static async getAll() {
-        return [await connectionPool.promise().query(`SELECT title from ${Category.#table}`)][0][0];
+        return [await connectionPool.promise().query(`SELECT * from ${Category.#table}`)][0][0];
     }
 
     static async getByNames(names) {
@@ -20,12 +20,12 @@ class Category extends Model {
         let template = `?,`.repeat(names.length);
         template = template.slice(0, template.length - 1);
 
-        return [await connectionPool.promise().query(`SELECT id, title from ${Category.#table} where title in (${template})`, names)][0][0]
+        return [await connectionPool.promise().query(`SELECT * from ${Category.#table} where title in (${template})`, names)][0][0]
     }
 
     static async getById(id) {
         const [rows] = await connectionPool.promise().query(
-            `SELECT id, title from ${Category.#table} where id = ?`, [id]);
+            `SELECT * from ${Category.#table} where id = ?`, [id]);
         const row = rows[0];
         if (!row) {
             return null;
