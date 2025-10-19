@@ -11,6 +11,12 @@ class Post extends Model {
         this.table = Post.#table;
     }
 
+    static async getCount() {
+        const [rows] = await connectionPool.promise().query('select count(*) as total from posts;');
+        const row = rows[0];
+        return row;
+    }
+
     static async getAll(options, queryValues) {
         let query = 'SELECT posts.title,posts.id, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\

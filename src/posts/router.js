@@ -10,7 +10,7 @@ import Like from "../models/Like.js";
 import validationErrors from "../validators/validationErrorsMiddleware.js";
 import { postLikeValidator } from "../validators/like.validators.js";
 import { commentValidator } from "../validators/comment.validators.js";
-import queryValidator from "../validators/query.validators.js";
+import { queryValidator } from "../validators/query.validators.js";
 import { mustBePostCreator, mustBeAdmin } from "../utils/permissionCheck.js";
 
 const postsRouter = express.Router();

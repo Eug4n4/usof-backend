@@ -5,31 +5,9 @@ import User from "../models/User.js"
 import Like from "../models/Like.js";
 import Comment from "../models/Comment.js";
 import getAuthUserData from "../auth/getAuthUserData.js";
-import { SortAscending, SortDescending } from "../db/QuerySort.js";
 import { CategoryFilter, DateFilter, FieldFilter, RoleFilter } from "../db/QueryFilter.js";
 import Favorite from "../models/Favorite.js";
-
-const getSortingStrategy = (sort, order) => {
-    let result = new SortDescending('likes');
-    const setInstance = (sortField, Klass) => {
-        switch (sortField) {
-            case 'likes':
-                result = new Klass('likes');
-                break;
-            case 'date':
-                result = new Klass('posts.publish_date')
-                break;
-            default:
-                break;
-        }
-    }
-    if (order === 'asc') {
-        setInstance(sort, SortAscending)
-    } else if (order === 'desc') {
-        setInstance(sort, SortDescending)
-    }
-    return result;
-}
+import { PostSortStrategy } from "../strategies/SortStrategy.js";
 
 const getFilterStrategy = (categoriesLength, startInterval, endInterval, status, role) => {
 
@@ -56,20 +34,23 @@ const getFilterStrategy = (categoriesLength, startInterval, endInterval, status,
 const getAll = async (req, res) => {
     const { access, refresh } = req.cookies;
     const userData = getAuthUserData(access, refresh);
-    let { sort, order, category, startDate, endDate, status, page } = req.query;
+    let { sort, order, category, startDate, endDate, status, page, pageSize } = req.query;
     page = Number(page);
+    pageSize = Number(pageSize);
 
     if (isNaN(page) || page < 1) {
         page = 1;
     }
-    const pageSize = 10;
+    if (isNaN(pageSize) || pageSize < 1) {
+        pageSize = 5;
+    }
     const offset = (page - 1) * pageSize
     if (status === 'active') {
         status = 1;
     } else if (status === 'inactive') {
         status = 0;
     }
-    const sortingStrategy = getSortingStrategy(sort, order)
+    const sortingStrategy = PostSortStrategy.get(sort, order);
     let filterStrategy;
     let queryValues = [];
     if (Array.isArray(category)) {
@@ -86,6 +67,7 @@ const getAll = async (req, res) => {
         queryValues.push(userData.id)
         posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
     }
+    const totalPosts = await Post.getCount();
     let nextUrl;
     let previousUrl;
     if (req.url.match(/page=[^&]*/g) != null) {
@@ -101,12 +83,14 @@ const getAll = async (req, res) => {
             'page': `${req.host}${req.baseUrl}${req.url}`,
             'next': `${req.host}${req.baseUrl}${nextUrl}`,
             'prev': `${req.host}${req.baseUrl}${previousUrl}`,
+            'total': totalPosts.total,
             'data': posts
         })
     } else {
         res.json({
             'page': `${req.host}${req.baseUrl}${req.url}`,
             'next': `${req.host}${req.baseUrl}${nextUrl}`,
+            'total': totalPosts.total,
             'data': posts
         })
     }
