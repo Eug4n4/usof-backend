@@ -9,10 +9,16 @@ class Category extends Model {
         this.table = Category.#table;
     }
 
-    static async getAll() {
-        return [await connectionPool.promise().query(`SELECT * from ${Category.#table}`)][0][0];
-    }
+    static async getAll(queryValues) {
+        const query = `SELECT * from ${Category.#table} limit ?,?`;
 
+        return [await connectionPool.promise().query(query, queryValues)][0][0];
+    }
+    static async getCount() {
+        const [rows] = await connectionPool.promise().query('select count(*) as total from categories');
+        const row = rows[0];
+        return row;
+    }
     static async getByNames(names) {
         if (!names.length) {
             return [];

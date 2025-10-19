@@ -6,10 +6,11 @@ import { categoryValidator } from "../validators/category.validators.js";
 import authMiddleware from "../auth/authMiddleware.js";
 import validationErrors from "../validators/validationErrorsMiddleware.js";
 import { mustBeAdmin } from "../utils/permissionCheck.js";
+import { paginationValidator } from "../validators/query.validators.js";
 
 const categoryRouter = express.Router();
 
-categoryRouter.get('/', getByParameter(undefined, Category.getAll))
+categoryRouter.get('/', ...paginationValidator, validationErrors, getAll)
 categoryRouter.get('/:category_id', getByParameter('category_id', Category.getById))
 categoryRouter.get('/:category_id/posts', getByParameter('category_id', Category.getRelatedPosts))
 categoryRouter.post('/', authMiddleware, ...categoryValidator, validationErrors, mustBeAdmin, createOne)

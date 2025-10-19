@@ -2,8 +2,23 @@ import { matchedData, validationResult } from "express-validator";
 import Category from "../models/Category.js";
 
 const getAll = async (req, res) => {
-    const result = await Category.getAll();
-    res.json(result);
+    let { page, pageSize } = req.query;
+    page = Number(page);
+    pageSize = Number(pageSize);
+    if (isNaN(page) || page < 1) {
+        page = 1;
+    }
+    if (isNaN(pageSize) || pageSize < 1) {
+        pageSize = 5;
+    }
+    const offset = (page - 1) * pageSize;
+    const queryValues = [];
+    queryValues.push(offset);
+    queryValues.push(pageSize);
+    const result = await Category.getAll(queryValues);
+    const total = await Category.getCount();
+
+    res.json({ "total": total.total, "data": result });
 }
 
 const getOne = async (req, res) => {
