@@ -8,7 +8,10 @@ const getByParameter = (paramName, method) => {
         } else {
             jsonBody = await method();
         }
-        res.json(jsonBody);
+        if (jsonBody != undefined) {
+            return res.json(jsonBody);
+        }
+        return res.status(404).json({ "message": "I cant find this" })
     }
 }
 
