@@ -9,13 +9,15 @@ import { adminHashPassword, hideToken } from "./utils/admin.js"
 import authMiddleware from "./auth/authMiddleware.js"
 import { mustBeAdmin } from "./utils/permissionCheck.js"
 import cors from "cors"
-
+import path, { dirname } from "path"
+import { fileURLToPath } from "url"
 const HOST = process.env.BACKEND_HOST || 'http://localhost'
 const PORT = Number(process.env.BACKEND_PORT) || 3000;
 AdminJS.registerAdapter({
     Database,
     Resource
 })
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const start = async () => {
     const app = express();
     app.use(cookieParser())
@@ -23,6 +25,10 @@ const start = async () => {
     app.use(express.raw())
     app.use(express.json());
     app.use(express.urlencoded())
+    app.use(
+        "/uploads/avatars",
+        express.static(path.join(__dirname, "..", "uploads/avatars")),
+    );
     app.use('/api', router);
     const db = await new Adapter("mysql2", config).init();
     const admin = new AdminJS({
