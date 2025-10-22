@@ -17,8 +17,9 @@ class QueryFilter {
 
 class FieldFilter extends QueryFilter {
     apply(query) {
-        query += `${this.field} = ${this.value} and `
+        query += `${this.field} = ${this.value}`
         if (this.wrapper) {
+            query += " and "
             query = this.wrapper.apply(query)
         }
         return query;
@@ -54,8 +55,9 @@ class DateFilter extends QueryFilter {
     }
 
     apply(query) {
-        query += `(${this.field} >= '${this.startInterval}' and ${this.field} <= '${this.endInterval}') and `
+        query += `(${this.field} >= '${this.startInterval}' and ${this.field} <= '${this.endInterval}')`
         if (this.wrapper) {
+            query += " and "
             query = this.wrapper.apply(query)
         }
         return query;
