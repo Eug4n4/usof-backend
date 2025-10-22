@@ -70,3 +70,5 @@ Refer to `DOCS.md` in order to find information about developing stages and algo
 4. Run `npm install` in order to get all project's dependencies.
 5. Run `npm run db:create` to create database and fill it with some test data (In case of recreation, please, run `npm run db:drop` and then `npm run db:create`).
 6. Finally, run `npm start` to launch the program.
+
+> **Note** Of course you can create the database and tables defined in .sql scripts under `src/db` directory manually. In this case  `DB_USER` and `DB_PASSWORD` fields should not necessarily contain credentials from your root account, but keep in mind that this user must be able to create triggers for own databases.
