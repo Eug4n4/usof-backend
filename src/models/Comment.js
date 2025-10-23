@@ -20,13 +20,27 @@ class Comment extends Model {
         return new Comment(row);
     }
 
-    static async getByPostId(id) {
-        return [await connectionPool.promise().query(
-            `select posts.title as post, posts.publish_date, users.full_name as author, comments.content,\ 
-            comments.publish_date as comment_date from posts right join comments on comments.post_id = posts.id \
-            inner join users on users.id = comments.author where posts.id = ?`,
-            [id]
-        )][0][0]
+    static async getPostCommentCount(postId) {
+        const [rows] = await connectionPool.promise().query('select count(*) as total from comments where post_id = ?', [postId]);
+        const row = rows[0];
+        return row;
+    }
+
+    static async getByPostId(options) {
+        let query = "select comments.id, users.full_name as author, comments.content, comments.publish_date as comment_date, coalesce(likes.likes, 0) as likes, coalesce(likes.dislikes, 0) as dislikes \
+        from posts right join comments on comments.post_id = posts.id inner join users on users.id = comments.author \
+        left join (select comment_id, sum(type = 1) as likes, sum(type = 0) as dislikes from likes where comment_id is not null group by comment_id) \
+        as likes on likes.comment_id = comments.id";
+        if (options['filter']) {
+            query += ' where '
+            query = options['filter'].apply(query)
+        }
+        if (options['sort']) {
+            query += ' order by ';
+            query = options['sort'].apply(query);
+        }
+        query += ` limit ?,?`;
+        return [await connectionPool.promise().query(query, [options['offset'], options['pageSize']])][0][0]
     }
 
     static async getByUserId(id) {

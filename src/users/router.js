@@ -7,15 +7,17 @@ import { loginValidator, loginUnique } from '../validators/login.validators.js';
 import { passwordConfirmation, passwordValidator, updatePasswordValidator } from '../validators/password.validators.js';
 import { emailUnique, emailValidator } from '../validators/email.validators.js';
 import validationErrors from '../validators/validationErrorsMiddleware.js';
-import { createUser, deleteUser, getFavorites, updateUser, uploadAvatar } from './users.controller.js';
+import { createUser, deleteUser, getFavorites, getUserPosts, updateUser, uploadAvatar } from './users.controller.js';
 import { roleCreateValidator, roleUpdateValidator } from '../validators/role.validators.js';
 import { mustBeAdmin, mustBeAdminOrSelf } from "../utils/permissionCheck.js";
 import upload from './avatars.js';
+import { queryValidator } from '../validators/query.validators.js';
 
 const userRouter = express.Router();
 
 userRouter.get('/', getByParameter(undefined, User.getAll))
-userRouter.get('/favorites', authMiddleware, getFavorites)
+userRouter.get('/favorites', authMiddleware, ...queryValidator, validationErrors, getFavorites)
+userRouter.get('/posts', authMiddleware, ...queryValidator, validationErrors, getUserPosts)
 userRouter.get('/:user_id', getByParameter('user_id', User.getById))
 userRouter.post('/', authMiddleware,
     mustBeAdmin,

@@ -7,27 +7,64 @@ import Comment from "../models/Comment.js";
 import getAuthUserData from "../auth/getAuthUserData.js";
 import { CategoryFilter, DateFilter, FieldFilter, RoleFilter } from "../db/QueryFilter.js";
 import Favorite from "../models/Favorite.js";
-import { PostSortStrategy } from "../strategies/SortStrategy.js";
+import { CommentSortStrategy, PostSortStrategy } from "../strategies/SortStrategy.js";
 
-const getFilterStrategy = (categoriesLength, startInterval, endInterval, status, role) => {
+// const getFilterStrategy = (categoriesLength, startInterval, endInterval, status, role) => {
 
+//     let result
+//     if (role) {
+//         result = new RoleFilter(role, result)
+//     } else {
+//         result = new RoleFilter(undefined, result);
+//     }
+//     if (status == 1 || status == 0) {
+//         result = new FieldFilter('posts.is_active', status, result)
+//     }
+//     if (startInterval && endInterval) {
+//         result = new DateFilter('posts.publish_date', startInterval, endInterval, result)
+//     }
+//     if (categoriesLength > 0) {
+//         result = new CategoryFilter('categories.title', categoriesLength, result);
+
+//     }
+
+//     return result;
+// }
+
+export const getFilterStrategy = (fields) => {
     let result
-    if (role) {
-        result = new RoleFilter(role, result)
-    } else {
-        result = new RoleFilter(undefined, result);
+    for (const field of fields) {
+        switch (field.name) {
+            case "id": {
+                result = new FieldFilter(field.value.field, field.value.value, result);
+                break;
+            }
+            case "date": {
+                const from = field.value.value.from;
+                const to = field.value.value.to;
+                if (from && to) {
+                    result = new DateFilter(field.value.field, field.value.value.from, field.value.value.to, result)
+                }
+                break;
+            }
+            case "status": {
+                if (field.value.value) {
+                    result = new FieldFilter(field.value.field, field.value.value, result)
+                }
+                break;
+            }
+            case "categories":
+                for (const cat of field.value) {
+                    result = new FieldFilter("categories.title", cat, result)
+                }
+                break;
+            case "role":
+                result = new RoleFilter(field.value, result)
+                break;
+            default:
+                break;
+        }
     }
-    if (status == 1 || status == 0) {
-        result = new FieldFilter('posts.is_active', status, result)
-    }
-    if (startInterval && endInterval) {
-        result = new DateFilter('posts.publish_date', startInterval, endInterval, result)
-    }
-    if (categoriesLength > 0) {
-        result = new CategoryFilter('categories.title', categoriesLength, result);
-
-    }
-
     return result;
 }
 
@@ -51,15 +88,20 @@ const getAll = async (req, res) => {
         status = 0;
     }
     const sortingStrategy = PostSortStrategy.get(sort, order);
-    let filterStrategy;
-    let queryValues = [];
+    const filterOptions = [];
+    const queryValues = [];
     if (Array.isArray(category)) {
         queryValues.push(...category)
-        filterStrategy = getFilterStrategy(category.length, startDate, endDate, status, userData?.role)
     } else {
-        queryValues.push(category)
-        filterStrategy = getFilterStrategy(category == undefined ? 0 : 1, startDate, endDate, status, userData?.role)
+        queryValues.push(...[category].filter(Boolean))
     }
+    filterOptions.push({ name: "role", value: userData?.role })
+    filterOptions.push({ name: "status", value: { field: "posts.is_active", value: status } })
+    filterOptions.push({ name: "date", value: { field: "posts.publish_date", value: { from: startDate, to: endDate } } })
+    filterOptions.push({ name: "categories", value: queryValues })
+
+    let filterStrategy = getFilterStrategy(filterOptions);
+
     let posts;
     if (userData?.role === 'admin' || userData == undefined) {
         posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
@@ -144,6 +186,37 @@ const createComment = async (req, res) => {
     res.status(201);
     res.json({ 'message': 'comment created' })
 
+}
+
+const getComments = async (req, res) => {
+    const postId = req.params['post_id']
+    let { sort, order, status, page, pageSize } = req.query;
+    page = Number(page);
+    pageSize = Number(pageSize);
+    if (isNaN(page) || page < 1) {
+        page = 1;
+    }
+    if (isNaN(pageSize) || pageSize < 1) {
+        pageSize = 5;
+    }
+    const offset = (page - 1) * pageSize
+    if (status === 'active') {
+        status = 1;
+    } else if (status === 'inactive') {
+        status = 0;
+    }
+    const filterOptions = [];
+    filterOptions.push({ name: "id", value: { field: "posts.id", value: postId } })
+    const sortingStrategy = CommentSortStrategy.get(sort, order);
+    const filterStrategy = getFilterStrategy(filterOptions);
+    try {
+        const comments = await Comment.getByPostId({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset })
+        const count = await Comment.getPostCommentCount(postId);
+        return res.json({ total: count.total, data: comments })
+    } catch {
+        return res.status(404).json({ "message": "I cant find this" })
+
+    }
 }
 
 const addToFavorite = async (req, res) => {
@@ -241,4 +314,4 @@ const deleteLike = async (req, res) => {
     }
 }
 
-export { getAll, getOne, createOne, createLike, createComment, updatePost, updatePostAdmin, deletePost, deleteLike, addToFavorite, deleteFromFavorites };
+export { getAll, getOne, getComments, createOne, createLike, createComment, updatePost, updatePostAdmin, deletePost, deleteLike, addToFavorite, deleteFromFavorites };

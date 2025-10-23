@@ -17,6 +17,12 @@ class Post extends Model {
         return row;
     }
 
+    static async getAuthorCount(authorId) {
+        const [rows] = await connectionPool.promise().query('select count(*) as total from posts where author = ?', [authorId]);
+        const row = rows[0];
+        return row;
+    }
+
     static async getAll(options, queryValues) {
         let query = 'SELECT posts.title,posts.id, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
@@ -46,7 +52,7 @@ class Post extends Model {
 
     static async getById(id) {
         const [rows] = await connectionPool.promise().query(
-            `select posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+            `select posts.id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
             COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
             inner join users on posts.author = users.id \
@@ -58,6 +64,30 @@ class Post extends Model {
         )
         const row = rows[0];
         return row;
+    }
+
+    static async getByAuthorId(options, queryValues) {
+        let query = `select posts.title,posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+            users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
+            COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
+            inner join users on posts.author = users.id left join post_categories on posts.id = post_categories.post_id \ 
+			left join categories on categories.id = post_categories.category_id \
+            LEFT JOIN (SELECT post_id, SUM(type = 1) AS likes, SUM(type = 0) AS dislikes FROM likes GROUP BY post_id) \
+            likes on likes.post_id = posts.id`;
+        if (options['filter']) {
+            query += ' where '
+            query = options['filter'].apply(query)
+        }
+        query += ' group by posts.id ';
+        if (options['sort']) {
+            query += 'order by ';
+            query = options['sort'].apply(query);
+        }
+        query += ` limit ?,?`;
+        queryValues.push(options['offset']);
+        queryValues.push(options['pageSize']);
+        return [await connectionPool.promise().query(query, queryValues)][0][0]
+
     }
 
     static async getByPostAuthorId(postId, authorId) {

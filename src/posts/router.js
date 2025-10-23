@@ -1,5 +1,5 @@
 import express from "express";
-import { createComment, createLike, createOne, getAll, getOne, updatePostAdmin, updatePost, deletePost, deleteLike, addToFavorite, deleteFromFavorites } from "./post.controller.js";
+import { createComment, createLike, createOne, getAll, getOne, updatePostAdmin, updatePost, deletePost, deleteLike, addToFavorite, deleteFromFavorites, getComments } from "./post.controller.js";
 import { postValidator, postAdminValidator } from "../validators/post.validators.js";
 import { getByParameter } from "../utils/getByParameter.js";
 import Post from "../models/Post.js";
@@ -17,7 +17,7 @@ const postsRouter = express.Router();
 
 postsRouter.get('/', ...queryValidator, validationErrors, getAll)
 postsRouter.get('/:post_id', getByParameter('post_id', Post.getById))
-postsRouter.get('/:post_id/comments', getByParameter('post_id', Comment.getByPostId))
+postsRouter.get('/:post_id/comments', ...queryValidator, validationErrors, getComments)
 postsRouter.get('/:post_id/categories', getByParameter('post_id', Category.getByPostId))
 postsRouter.get('/:post_id/like', getByParameter('post_id', Like.getByPostId))
 postsRouter.post('/', authMiddleware, ...postValidator, validationErrors, createOne)

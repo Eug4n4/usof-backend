@@ -4,6 +4,9 @@ import Role from "../models/Role.js";
 import User from "../models/User.js";
 import hash_password from "../utils/hash_password.js";
 import Favorite from "../models/Favorite.js";
+import { PostSortStrategy } from "../strategies/SortStrategy.js";
+import { getFilterStrategy } from "../posts/post.controller.js";
+import Post from "../models/Post.js";
 
 
 const getAll = async (req, res) => {
@@ -23,8 +26,88 @@ const getOne = async (req, res) => {
 }
 
 const getFavorites = async (req, res) => {
-    const favorites = await Favorite.getByUserId(req.user['id']);
-    res.json(favorites);
+    const id = req.user.id
+    let { sort, order, category, startDate, endDate, status, page, pageSize } = req.query;
+    page = Number(page);
+    pageSize = Number(pageSize);
+
+    if (isNaN(page) || page < 1) {
+        page = 1;
+    }
+    if (isNaN(pageSize) || pageSize < 1) {
+        pageSize = 5;
+    }
+    const offset = (page - 1) * pageSize
+    if (status === 'active') {
+        status = 1;
+    } else if (status === 'inactive') {
+        status = 0;
+    }
+    const sortingStrategy = PostSortStrategy.get(sort, order);
+    const filterOptions = [];
+    const queryValues = [];
+    if (Array.isArray(category)) {
+        queryValues.push(...category)
+    } else {
+        queryValues.push(...[category].filter(Boolean))
+    }
+    filterOptions.push({ name: "id", value: { field: "favorites.user_id", value: id } })
+    filterOptions.push({ name: "status", value: { field: "posts.is_active", value: status } })
+    filterOptions.push({ name: "date", value: { field: "posts.publish_date", value: { from: startDate, to: endDate } } })
+    filterOptions.push({ name: "categories", value: queryValues })
+    const filterStrategy = getFilterStrategy(filterOptions);
+    try {
+        const favorites = await Favorite.getByUserId({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues);
+
+        const count = await Favorite.getCount(id);
+        res.json({ data: favorites, total: count.total });
+
+    } catch (e) {
+        console.log(e.message)
+        res.status(404).json({ message: "I cant find this" })
+    }
+}
+
+const getUserPosts = async (req, res) => {
+    const id = req.user.id
+    let { sort, order, category, startDate, endDate, status, page, pageSize } = req.query;
+    page = Number(page);
+    pageSize = Number(pageSize);
+
+    if (isNaN(page) || page < 1) {
+        page = 1;
+    }
+    if (isNaN(pageSize) || pageSize < 1) {
+        pageSize = 5;
+    }
+    const offset = (page - 1) * pageSize
+    if (status === 'active') {
+        status = 1;
+    } else if (status === 'inactive') {
+        status = 0;
+    }
+    const sortingStrategy = PostSortStrategy.get(sort, order);
+    const filterOptions = [];
+    const queryValues = [];
+    if (Array.isArray(category)) {
+        queryValues.push(...category)
+    } else {
+        queryValues.push(...[category].filter(Boolean))
+    }
+    filterOptions.push({ name: "id", value: { field: "posts.author", value: id } })
+    filterOptions.push({ name: "status", value: { field: "posts.is_active", value: status } })
+    filterOptions.push({ name: "date", value: { field: "posts.publish_date", value: { from: startDate, to: endDate } } })
+    filterOptions.push({ name: "categories", value: queryValues })
+    const filterStrategy = getFilterStrategy(filterOptions);
+
+    try {
+        const posts = await Post.getByAuthorId({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
+        const count = await Post.getAuthorCount(id);
+        res.json({ total: count.total, data: posts })
+    } catch (e) {
+        console.warn(e.message)
+        res.status(404).json({ message: "I cant find this" })
+    }
 }
 
 const createUser = async (req, res) => {
@@ -99,4 +182,4 @@ const uploadAvatar = async (req, res) => {
     }
 
 }
-export { getAll, getOne, createUser, updateUser, deleteUser, uploadAvatar, getFavorites };
+export { getAll, getOne, getUserPosts, createUser, updateUser, deleteUser, uploadAvatar, getFavorites };
