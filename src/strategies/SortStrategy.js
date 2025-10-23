@@ -3,7 +3,7 @@ class PostSortStrategy {
 
     static get(fieldName, order) {
         if (fieldName == undefined) {
-            fieldName = "date";
+            fieldName = "likes";
         }
         if (order == undefined) {
             order = "desc";
@@ -48,10 +48,12 @@ class SortContext {
             "desc": {
                 "likes": new SortDescending("likes"),
                 "dislikes": new SortDescending("dislikes"),
+                "date": new SortDescending("comment_date")
             },
             "asc": {
                 "likes": new SortAscending("likes"),
                 "dislikes": new SortAscending("dislikes"),
+                "date": new SortDescending("comment_date")
             }
 
         })
