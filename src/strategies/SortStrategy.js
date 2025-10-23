@@ -53,7 +53,7 @@ class SortContext {
             "asc": {
                 "likes": new SortAscending("likes"),
                 "dislikes": new SortAscending("dislikes"),
-                "date": new SortDescending("comment_date")
+                "date": new SortAscending("comment_date")
             }
 
         })

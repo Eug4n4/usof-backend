@@ -17,7 +17,7 @@ const login = async (req, res) => {
             if (oldToken) {
                 await oldToken.delete()
             }
-            const { access, refresh } = createTokenPair(userDto)
+            const { access, refresh } = await createTokenPair(userDto)
             res.cookie("access", access['token'], { expires: new Date(access['expires']) })
             res.cookie("refresh", refresh['token'], { httpOnly: true, expires: new Date(refresh['expires']) })
             res.json(userDto)

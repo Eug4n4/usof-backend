@@ -182,10 +182,15 @@ const createLike = async (req, res) => {
 const createComment = async (req, res) => {
     const { content } = matchedData(req);
     const postId = req.params['post_id'];
-    new Comment({ author: req.user.id, post_id: postId, content: content }).save();
-    res.status(201);
-    res.json({ 'message': 'comment created' })
-
+    const comment = new Comment({ author: req.user.id, post_id: postId, content: content });
+    try {
+        await comment.save()
+        const responseData = await Comment.getById(comment.id);
+        res.status(201).json({ data: responseData });
+    } catch (e) {
+        console.log(e.message)
+        return res.status(500).json({ "message": "Failed to save comment" })
+    }
 }
 
 const getComments = async (req, res) => {
