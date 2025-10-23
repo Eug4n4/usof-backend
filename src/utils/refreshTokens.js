@@ -13,7 +13,7 @@ const refresh = async (refreshToken) => {
     }
     await token.delete()
     const userDto = await UserDto.createInstance(user)
-    const { access, refresh } = createTokenPair(userDto);
+    const { access, refresh } = await createTokenPair(userDto);
     return { access, refresh }
 }
 

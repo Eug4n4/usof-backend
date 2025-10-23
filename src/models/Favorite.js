@@ -9,7 +9,7 @@ class Favorite extends Model {
     }
 
     static async getCount(userId) {
-        const [rows] = await connectionPool.promise().query(`select count(*) from favorites where user_id = ?`, [userId])
+        const [rows] = await connectionPool.promise().query(`select count(*) as total from favorites where user_id = ?`, [userId])
         const row = rows[0]
         return row;
     }

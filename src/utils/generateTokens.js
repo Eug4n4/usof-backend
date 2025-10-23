@@ -18,10 +18,10 @@ const generateRefreshToken = (user) => {
     }
 }
 
-const createTokenPair = (user) => {
+const createTokenPair = async (user) => {
     const access = generateAccessToken(user);
     const refresh = generateRefreshToken(user);
-    new Token({ user_id: user['id'], refresh: refresh['token'] }).save()
+    await new Token({ user_id: user['id'], refresh: refresh['token'] }).save()
     return { access, refresh }
 }
 
