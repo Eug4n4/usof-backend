@@ -16,7 +16,7 @@ class Favorite extends Model {
 
     static async getByUserId(options, queryValues) {
         let query = `
-           select full_name as author, favorites.post_id as id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+           select full_name as author, favorites.post_id as id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
         coalesce(likes.likes,0) as likes, coalesce(likes.dislikes, 0) as dislikes from favorites inner join posts on posts.id = favorites.post_id \
         inner join users on users.id = posts.author left join post_categories on posts.id = post_categories.post_id \ 
 			left join categories on categories.id = post_categories.category_id \

@@ -52,7 +52,7 @@ class Post extends Model {
 
     static async getById(id) {
         const [rows] = await connectionPool.promise().query(
-            `select posts.id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+            `select posts.id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
             COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
             inner join users on posts.author = users.id \
@@ -67,7 +67,7 @@ class Post extends Model {
     }
 
     static async getByAuthorId(options, queryValues) {
-        let query = `select posts.title,posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+        let query = `select posts.id, posts.title,posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
             COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
             inner join users on posts.author = users.id left join post_categories on posts.id = post_categories.post_id \ 
@@ -92,7 +92,7 @@ class Post extends Model {
 
     static async getByPostAuthorId(postId, authorId) {
         const [rows] = await connectionPool.promise().query(
-            `select posts.title, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(categories.title),JSON_ARRAY()) AS categories, \
+            `select posts.title, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
             COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
             inner join users on posts.author = users.id \
