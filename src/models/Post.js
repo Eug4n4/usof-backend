@@ -11,8 +11,8 @@ class Post extends Model {
         this.table = Post.#table;
     }
 
-    static async getCount() {
-        const [rows] = await connectionPool.promise().query('select count(*) as total from posts;');
+    static async getCount(query, queryValues) {
+        const [rows] = await connectionPool.promise().query(`select count(distinct(posts.id)) as total ${query}`, queryValues);
         const row = rows[0];
         return row;
     }
@@ -23,30 +23,36 @@ class Post extends Model {
         return row;
     }
 
-    static async getAll(options, queryValues) {
-        let query = 'SELECT posts.title,posts.id, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
+    static async getFilteredAndCount(options, queryValues) {
+        const fields = 'select posts.title,posts.id, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
             users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
-            COALESCE(MAX(likes.dislikes), 0) AS dislikes FROM posts \
+            COALESCE(MAX(likes.dislikes), 0) AS dislikes';
+        let filteredQuery = `FROM posts \
             inner join users on posts.author = users.id \
             LEFT JOIN post_categories ON posts.id = post_categories.post_id \
             LEFT JOIN categories ON categories.id = post_categories.category_id \
             LEFT JOIN (SELECT post_id, SUM(type = 1) AS likes, SUM(type = 0) AS dislikes FROM likes GROUP BY post_id) \
-            likes ON likes.post_id = posts.id';
+            likes ON likes.post_id = posts.id`
         if (options['filter']) {
-            query += ' where '
-            query = options['filter'].apply(query)
+            filteredQuery += ' where '
+            filteredQuery = options['filter'].apply(filteredQuery);
         }
-        query += ' group by posts.id ';
-
+        const count = await Post.getCount(filteredQuery, queryValues);
+        filteredQuery += ' group by posts.id '
         if (options['sort']) {
-            query += 'order by ';
-            query = options['sort'].apply(query);
+            filteredQuery += 'order by '
+            filteredQuery = options['sort'].apply(filteredQuery);
         }
-        query += ` limit ?,?`;
+        filteredQuery += ' limit ?,?';
+        const query = `${fields} ${filteredQuery}`
         queryValues = queryValues.filter(value => value != undefined);
         queryValues.push(options['offset']);
         queryValues.push(options['pageSize']);
-        return [await connectionPool.promise().query(query, queryValues)][0][0]
+        return { count: count.total, data: [await connectionPool.promise().query(query, queryValues)][0][0] }
+    }
+
+    static async getAll(options, queryValues) {
+        return Post.getFilteredAndCount(options, queryValues)
 
     }
 
@@ -67,26 +73,7 @@ class Post extends Model {
     }
 
     static async getByAuthorId(options, queryValues) {
-        let query = `select posts.id, posts.title,posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
-            users.full_name as author, COALESCE(MAX(likes.likes), 0) AS likes,\
-            COALESCE(MAX(likes.dislikes), 0) AS dislikes from posts \
-            inner join users on posts.author = users.id left join post_categories on posts.id = post_categories.post_id \ 
-			left join categories on categories.id = post_categories.category_id \
-            LEFT JOIN (SELECT post_id, SUM(type = 1) AS likes, SUM(type = 0) AS dislikes FROM likes GROUP BY post_id) \
-            likes on likes.post_id = posts.id`;
-        if (options['filter']) {
-            query += ' where '
-            query = options['filter'].apply(query)
-        }
-        query += ' group by posts.id ';
-        if (options['sort']) {
-            query += 'order by ';
-            query = options['sort'].apply(query);
-        }
-        query += ` limit ?,?`;
-        queryValues.push(options['offset']);
-        queryValues.push(options['pageSize']);
-        return [await connectionPool.promise().query(query, queryValues)][0][0]
+        return Post.getFilteredAndCount(options, queryValues)
 
     }
 

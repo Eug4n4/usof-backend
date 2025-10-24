@@ -103,14 +103,16 @@ const getAll = async (req, res) => {
 
     let filterStrategy = getFilterStrategy(filterOptions);
 
-    let posts;
+    let count, posts;
+    let dataSet;
     if (userData?.role === 'admin' || userData == undefined) {
-        posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
+        dataSet = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
     } else if (userData?.role === 'user') {
         queryValues.push(userData.id)
-        posts = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
+        dataSet = await Post.getAll({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
     }
-    const totalPosts = await Post.getCount();
+    posts = dataSet.data
+    count = dataSet.count;
     let nextUrl;
     let previousUrl;
     if (req.url.match(/page=[^&]*/g) != null) {
@@ -126,14 +128,14 @@ const getAll = async (req, res) => {
             'page': `${req.host}${req.baseUrl}${req.url}`,
             'next': `${req.host}${req.baseUrl}${nextUrl}`,
             'prev': `${req.host}${req.baseUrl}${previousUrl}`,
-            'total': totalPosts.total,
+            'total': count,
             'data': posts
         })
     } else {
         res.json({
             'page': `${req.host}${req.baseUrl}${req.url}`,
             'next': `${req.host}${req.baseUrl}${nextUrl}`,
-            'total': totalPosts.total,
+            'total': count,
             'data': posts
         })
     }

@@ -8,33 +8,39 @@ class Favorite extends Model {
         this.table = Favorite.#table;
     }
 
-    static async getCount(userId) {
-        const [rows] = await connectionPool.promise().query(`select count(*) as total from favorites where user_id = ?`, [userId])
+    static async getCount(query, queryValues) {
+        const [rows] = await connectionPool.promise().query(`select count(*) as total ${query}`, [queryValues])
         const row = rows[0]
         return row;
     }
 
-    static async getByUserId(options, queryValues) {
-        let query = `
-           select full_name as author, favorites.post_id as id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
-        coalesce(likes.likes,0) as likes, coalesce(likes.dislikes, 0) as dislikes from favorites inner join posts on posts.id = favorites.post_id \
+    static async getFilteredAndCount(options, queryValues) {
+        const fields = 'select full_name as author, favorites.post_id as id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
+        coalesce(likes.likes,0) as likes, coalesce(likes.dislikes, 0) as dislikes';
+        let filteredQuery = `from favorites inner join posts on posts.id = favorites.post_id \
         inner join users on users.id = posts.author left join post_categories on posts.id = post_categories.post_id \ 
 			left join categories on categories.id = post_categories.category_id \
             left join (select post_id, sum(type = 1) as likes, sum(type = 0) as dislikes from likes \
         where post_id is not null group by post_id) as likes on likes.post_id = favorites.post_id`
         if (options['filter']) {
-            query += ' where '
-            query = options['filter'].apply(query)
+            filteredQuery += ' where '
+            filteredQuery = options['filter'].apply(filteredQuery);
         }
-        query += ' group by favorites.post_id, users.full_name, likes.likes, likes.dislikes '
+        const count = await Favorite.getCount(filteredQuery, queryValues);
+        filteredQuery += ' group by favorites.post_id, users.full_name, likes.likes, likes.dislikes '
         if (options['sort']) {
-            query += 'order by ';
-            query = options['sort'].apply(query);
+            filteredQuery += 'order by '
+            filteredQuery = options['sort'].apply(filteredQuery);
         }
-        query += ` limit ?,?`;
+        filteredQuery += ' limit ?,?';
+        const query = `${fields} ${filteredQuery}`
         queryValues.push(options['offset']);
         queryValues.push(options['pageSize']);
-        return [await connectionPool.promise().query(query, queryValues)][0][0]
+        return { count: count.total, data: [await connectionPool.promise().query(query, queryValues)][0][0] }
+    }
+
+    static async getByUserId(options, queryValues) {
+        return Favorite.getFilteredAndCount(options, queryValues);
 
     }
 

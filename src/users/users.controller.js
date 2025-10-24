@@ -59,8 +59,7 @@ const getFavorites = async (req, res) => {
     try {
         const favorites = await Favorite.getByUserId({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues);
 
-        const count = await Favorite.getCount(id);
-        res.json({ data: favorites, total: count.total });
+        res.json({ data: favorites.data, total: favorites.count });
 
     } catch (e) {
         console.log(e.message)
@@ -102,8 +101,7 @@ const getUserPosts = async (req, res) => {
 
     try {
         const posts = await Post.getByAuthorId({ sort: sortingStrategy, filter: filterStrategy, pageSize: pageSize, offset: offset }, queryValues)
-        const count = await Post.getAuthorCount(id);
-        res.json({ total: count.total, data: posts })
+        res.json({ total: posts.count, data: posts.data })
     } catch (e) {
         console.warn(e.message)
         res.status(404).json({ message: "I cant find this" })
