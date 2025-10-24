@@ -53,11 +53,12 @@ export const getFilterStrategy = (fields) => {
                 }
                 break;
             }
-            case "categories":
-                for (const cat of field.value) {
-                    result = new FieldFilter("categories.title", cat, result)
+            case "categories": {
+                if (field.value.length !== 0) {
+                    result = new CategoryFilter("categories.title", field.value.length, result);
                 }
                 break;
+            }
             case "role":
                 result = new RoleFilter(field.value, result)
                 break;

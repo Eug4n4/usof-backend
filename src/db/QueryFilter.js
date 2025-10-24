@@ -32,15 +32,15 @@ class CategoryFilter extends FieldFilter {
         this.categoriesLength = categoriesLength;
     }
     apply(query) {
-        query += `${this.field}`
-        if (this.categoriesLength == 1) {
-            query += ` = ? and `;
-        } else {
+        const append = `exists (select 1 from post_categories join categories on categories.id = post_categories.category_id where post_categories.post_id = posts.id and categories.title in`
+        if (this.categoriesLength !== 0) {
+            query += append
             let template = '?,'.repeat(this.categoriesLength);
             template = template.slice(0, template.length - 1)
-            query += ` in (${template}) and `
+            query += ` (${template}))`
         }
         if (this.wrapper) {
+            query += " and "
             query = this.wrapper.apply(query)
 
         }
