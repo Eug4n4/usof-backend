@@ -2,7 +2,7 @@ import { body } from "express-validator";
 
 
 const commentValidator = [
-    body('content').exists().isLength({ max: 500 })
+    body('content').exists().isLength({ min: 5 })
 ]
 
 const commentEditValidator = [

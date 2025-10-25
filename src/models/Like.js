@@ -19,7 +19,7 @@ class Like extends Model {
 
     static async getByPostUserId(postId, userId) {
         const [rows] = await connectionPool.promise().query(
-            `select posts.title, users.full_name as author, likes.type, likes.id from likes \
+            `select posts.title, users.login as author, likes.type, likes.id from likes \
             inner join posts on posts.id = likes.post_id \
             inner join users on users.id = likes.author where likes.post_id = ? and likes.author = ?`,
             [postId, userId]

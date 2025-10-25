@@ -15,7 +15,7 @@ class Favorite extends Model {
     }
 
     static async getFilteredAndCount(options, queryValues) {
-        const fields = 'select full_name as author, favorites.post_id as id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
+        const fields = 'select login as author, favorites.post_id as id, posts.title, posts.content, posts.publish_date, posts.is_active, COALESCE(JSON_ARRAYAGG(JSON_OBJECT("id",categories.id, "title", categories.title)),JSON_ARRAY()) AS categories, \
         coalesce(likes.likes,0) as likes, coalesce(likes.dislikes, 0) as dislikes';
         let filteredQuery = `from favorites inner join posts on posts.id = favorites.post_id \
         inner join users on users.id = posts.author left join post_categories on posts.id = post_categories.post_id \ 
@@ -27,7 +27,7 @@ class Favorite extends Model {
             filteredQuery = options['filter'].apply(filteredQuery);
         }
         const count = await Favorite.getCount(filteredQuery, queryValues);
-        filteredQuery += ' group by favorites.post_id, users.full_name, likes.likes, likes.dislikes '
+        filteredQuery += ' group by favorites.post_id, users.login, likes.likes, likes.dislikes '
         if (options['sort']) {
             filteredQuery += 'order by '
             filteredQuery = options['sort'].apply(filteredQuery);
