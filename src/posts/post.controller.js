@@ -48,7 +48,7 @@ export const getFilterStrategy = (fields) => {
                 break;
             }
             case "status": {
-                if (field.value.value) {
+                if (field.value.value != undefined) {
                     result = new FieldFilter(field.value.field, field.value.value, result)
                 }
                 break;
