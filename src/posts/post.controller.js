@@ -227,6 +227,15 @@ const getComments = async (req, res) => {
     }
 }
 
+const getFromFavorites = async (req, res) => {
+    const id = req.params['post_id'];
+    const favorite = await Favorite.getByPostUserId(id, req.user['id'])
+    if (favorite) {
+        return res.json(favorite)
+    }
+    return res.status(404).json({ message: "I cant find this in your favorites list" })
+}
+
 const addToFavorite = async (req, res) => {
     const id = req.params['post_id'];
     const post = await Post.getById(id)
@@ -322,4 +331,18 @@ const deleteLike = async (req, res) => {
     }
 }
 
-export { getAll, getOne, getComments, createOne, createLike, createComment, updatePost, updatePostAdmin, deletePost, deleteLike, addToFavorite, deleteFromFavorites };
+export {
+    getAll,
+    getOne,
+    getFromFavorites,
+    getComments,
+    createOne,
+    createLike,
+    createComment,
+    updatePost,
+    updatePostAdmin,
+    deletePost,
+    deleteLike,
+    addToFavorite,
+    deleteFromFavorites
+};
