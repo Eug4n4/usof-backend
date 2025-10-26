@@ -1,7 +1,19 @@
 import { matchedData } from "express-validator";
 import Like from "../models/Like.js";
 import Comment from "../models/Comment.js";
+import CommentDto from "../dto/CommentDto.js";
 
+
+const getOne = async (req, res) => {
+    const comment_id = req.params['comment_id'];
+    const comment = await Comment.getById(comment_id);
+    if (comment) {
+        const dto = await CommentDto.createInstance(comment)
+        return res.json(dto)
+    }
+    return res.status(404).json({ "message": "I cant find this" })
+
+}
 
 const createLike = (req, res) => {
     const { type } = matchedData(req);
@@ -58,7 +70,8 @@ const updateComment = async (req, res) => {
     }
     comment.is_active = active;
     await comment.save()
-    res.json(comment);
+    const dto = await CommentDto.createInstance(comment)
+    res.json(dto);
 }
 
-export { createLike, deleteComment, deleteLike, updateComment }
+export { getOne, createLike, deleteComment, deleteLike, updateComment }

@@ -48,12 +48,12 @@ class SortContext {
             "desc": {
                 "likes": new SortDescending("likes"),
                 "dislikes": new SortDescending("dislikes"),
-                "date": new SortDescending("comment_date")
+                "date": new SortDescending("comments.publish_date")
             },
             "asc": {
                 "likes": new SortAscending("likes"),
                 "dislikes": new SortAscending("dislikes"),
-                "date": new SortAscending("comment_date")
+                "date": new SortAscending("comments.publish_date")
             }
 
         })

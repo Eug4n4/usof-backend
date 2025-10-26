@@ -10,12 +10,7 @@ class Comment extends Model {
 
     static async getById(id) {
         const [rows] = await connectionPool.promise().query(
-            "select comments.id, users.login as author, comments.content, comments.publish_date as comment_date, coalesce(likes.likes, 0) as likes, coalesce(likes.dislikes, 0) as dislikes \
-        from posts right join comments on comments.post_id = posts.id inner join users on users.id = comments.author \
-        left join (select comment_id, sum(type = 1) as likes, sum(type = 0) as dislikes from likes where comment_id is not null group by comment_id) \
-        as likes on likes.comment_id = comments.id where comments.id = ?",
-            [id]
-        )
+            "select comments.* from comments where comments.id = ?", [id])
         const row = rows[0];
         if (!row) {
             return null;
@@ -30,7 +25,7 @@ class Comment extends Model {
     }
 
     static async getByPostId(options) {
-        let query = "select comments.id, users.login as author, comments.content, comments.is_active as status, comments.publish_date as comment_date, coalesce(likes.likes, 0) as likes, coalesce(likes.dislikes, 0) as dislikes \
+        let query = "select comments.id, users.login as author, comments.content, comments.is_active as status, comments.publish_date, coalesce(likes.likes, 0) as likes, coalesce(likes.dislikes, 0) as dislikes \
         from posts right join comments on comments.post_id = posts.id inner join users on users.id = comments.author \
         left join (select comment_id, sum(type = 1) as likes, sum(type = 0) as dislikes from likes where comment_id is not null group by comment_id) \
         as likes on likes.comment_id = comments.id";
@@ -62,6 +57,15 @@ class Comment extends Model {
 
     static get table() {
         return Comment.#table;
+    }
+
+    async getAuthorLogin() {
+        const [rows] = await connectionPool.promise().query(`select login from users join comments on comments.author = users.id where comments.author = ? and comments.id = ?`, [this.author, this.id])
+        const row = rows[0];
+        if (!row) {
+            return null;
+        }
+        return row.login;
     }
 }
 
