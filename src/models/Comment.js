@@ -25,7 +25,7 @@ class Comment extends Model {
     }
 
     static async getByPostId(options) {
-        let query = "select comments.id, users.login as author, comments.content, comments.is_active as status, comments.publish_date, coalesce(likes.likes, 0) as likes, coalesce(likes.dislikes, 0) as dislikes \
+        let query = "select comments.id, users.login as author, users.photo, comments.content, comments.is_active as status, comments.publish_date, coalesce(likes.likes, 0) as likes, coalesce(likes.dislikes, 0) as dislikes \
         from posts right join comments on comments.post_id = posts.id inner join users on users.id = comments.author \
         left join (select comment_id, sum(type = 1) as likes, sum(type = 0) as dislikes from likes where comment_id is not null group by comment_id) \
         as likes on likes.comment_id = comments.id";

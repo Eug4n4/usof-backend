@@ -9,16 +9,16 @@ insert into users (login, password, full_name, email, role_id, is_active) values
 ('login5','$2b$10$CLk3ABiyOy/F46Gpoj2mHusI14e0Ybw9sPxHNImOHpzV/0v5r6PxO','Dad Joe', 'dadjoe@mail.com',1,1),
 ('login6','$2b$10$CLk3ABiyOy/F46Gpoj2mHusI14e0Ybw9sPxHNImOHpzV/0v5r6PxO','Admin Adminus', 'admin@hotmail.com',2,1);
 
-insert into posts (author, title, content) values 
-(1, 'How to center a div', 'help me center div, please'),
-(2, 'jakarta email throwing jakarta.mail.MessagingException: Could not convert socket to tls', 'help me with my problem'),
-(3, 'Interface without Jakarta Validation Annotation for Validation in Implementation Class', 'help me with my problem'),
-(1, 'Express routes not being hit; router testing middleware never logs requests', 'help me with my problem'),
-(4, 'Assembly loading at runtime for .NET and .NET Framework', 'help me with my problem'),
-(5, 'How do I store and use rax output into a register for later use?', 'help me with my problem'),
-(4, 'Adding custom CSS to Power Pages using VS code', 'help me with my problem'),
-(3, 'Why my x86 Asm code gets Segmentation fault?', 'help me with my problem'),
-(1, 'PhantomJs Emulate IE8', 'help me with my problem');
+insert into posts (author, title, content, publish_date) values 
+(1, 'How to center a div', 'help me center div, please', '2024-09-09 12:30:01'),
+(2, 'jakarta email throwing jakarta.mail.MessagingException: Could not convert socket to tls', 'help me with my problem','2023-05-10 10:15:01'),
+(3, 'Interface without Jakarta Validation Annotation for Validation in Implementation Class', 'help me with my problem','2024-09-09 14:21:01'),
+(1, 'Express routes not being hit; router testing middleware never logs requests', 'help me with my problem','2024-09-09 16:00:10'),
+(4, 'Assembly loading at runtime for .NET and .NET Framework', 'help me with my problem','2024-09-23 16:01:01'),
+(5, 'How do I store and use rax output into a register for later use?', 'help me with my problem','2025-11-09 12:30:01'),
+(4, 'Adding custom CSS to Power Pages using VS code', 'help me with my problem','2025-09-12 12:30:01'),
+(3, 'Why my x86 Asm code gets Segmentation fault?', 'help me with my problem','2025-08-12 13:05:01'),
+(1, 'PhantomJs Emulate IE8', 'help me with my problem','2024-09-09 11:09:01');
 
 
 insert into categories (title, description) values 
@@ -81,4 +81,12 @@ insert into likes (author, comment_id, type) values
 (5, 11, 1);
 
 
+insert into favorites (user_id, post_id) VALUES
+(1,2),
+(2,3),
+(1,4),
+(1,5),
+(1,6),
+(1,7),
+(1,8);
 
